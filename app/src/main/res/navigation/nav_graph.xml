@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    app:startDestination="@id/WishlistFragment">
+
+    <fragment
+        android:id="@+id/WishlistFragment"
+        android:name="com.cyto.bargainbooks.fragment.WishlistFragment"
+        android:label="wishlist_fragment"
+        tools:layout="@layout/fragment_search" />
+
+    <fragment
+        android:id="@+id/SaleFragment"
+        android:name="com.cyto.bargainbooks.fragment.SaleFragment"
+        android:label="sale_fragment"
+        tools:layout="@layout/fragment_sale" />
+
+    <fragment
+        android:id="@+id/SearchFragment"
+        android:name="com.cyto.bargainbooks.fragment.SearchFragment"
+        android:label="search_fragment"
+        tools:layout="@layout/fragment_search" />
+
+    <fragment
+        android:id="@+id/AddBookFragment"
+        android:name="com.cyto.bargainbooks.fragment.AddBookFragment"
+        android:label="add_book_fragment"
+        tools:layout="@layout/fragment_add_book" />
+
+    <fragment
+        android:id="@+id/ImportBooksFragment"
+        android:name="com.cyto.bargainbooks.fragment.ImportBooksFragment"
+        android:label="import_books_fragment"
+        tools:layout="@layout/fragment_import_books" />
+
+    <fragment
+        android:id="@+id/ConfigFragment"
+        android:name="com.cyto.bargainbooks.fragment.ConfigFragment"
+        android:label="config_fragment"
+        tools:layout="@layout/fragment_config" />
+
+</navigation>

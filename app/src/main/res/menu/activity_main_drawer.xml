@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_search"
+            android:title="@string/search"
+            android:visible="false" />
+        <item
+            android:id="@+id/nav_sale"
+            android:title="@string/sale" />
+        <item
+            android:id="@+id/nav_wishlist"
+            android:title="@string/wishlist" />
+
+        <item
+            android:id="@+id/nav_import_books"
+            android:title="@string/import_" />
+
+        <item
+            android:id="@+id/nav_config"
+            android:title="@string/config" />
+    </group>
+
+</menu>

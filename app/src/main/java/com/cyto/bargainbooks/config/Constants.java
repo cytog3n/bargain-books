@@ -3,7 +3,7 @@ package com.cyto.bargainbooks.config;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class Constant {
+public class Constants {
 
     public static final String storeLevel = "STORE_LEVEL";
 

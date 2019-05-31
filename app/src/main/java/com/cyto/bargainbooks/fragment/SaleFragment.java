@@ -26,8 +26,8 @@ import com.android.volley.toolbox.StringRequest;
 import com.cyto.bargainbooks.R;
 import com.cyto.bargainbooks.adapter.ExpandableBookListAdapter;
 import com.cyto.bargainbooks.adapter.ExpandableStoreListAdapter;
-import com.cyto.bargainbooks.config.Config;
-import com.cyto.bargainbooks.config.Constant;
+import com.cyto.bargainbooks.storage.Config;
+import com.cyto.bargainbooks.config.Constants;
 import com.cyto.bargainbooks.factory.RequestFactory;
 import com.cyto.bargainbooks.model.Book;
 import com.cyto.bargainbooks.request.handler.BookHandler;
@@ -109,10 +109,10 @@ public class SaleFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.sale_menu, menu);
-        if (config.getSaleLevel().equals(Constant.storeLevel)) {
+        if (config.getSaleLevel().equals(Constants.storeLevel)) {
             menu.removeItem(R.id.action_change_store_view);
             menu.removeItem(R.id.sort);
-        } else if (config.getSaleLevel().equals(Constant.bookLevel)) {
+        } else if (config.getSaleLevel().equals(Constants.bookLevel)) {
             menu.removeItem(R.id.action_change_book_view);
         }
         super.onCreateOptionsMenu(menu, inflater);
@@ -143,17 +143,17 @@ public class SaleFragment extends Fragment {
             progressBar.setMax(reqCount);
             progressBar.setVisibility(View.VISIBLE);
         } else if (id == R.id.action_change_book_view) {
-            if (config.getSaleLevel().equals(Constant.storeLevel)) {
-                config.setSaleLevel(Constant.bookLevel);
+            if (config.getSaleLevel().equals(Constants.storeLevel)) {
+                config.setSaleLevel(Constants.bookLevel);
                 refreshFragment();
             }
         } else if (id == R.id.action_change_store_view) {
-            if (config.getSaleLevel().equals(Constant.bookLevel)) {
-                config.setSaleLevel(Constant.storeLevel);
+            if (config.getSaleLevel().equals(Constants.bookLevel)) {
+                config.setSaleLevel(Constants.storeLevel);
                 refreshFragment();
             }
         } else if (id == R.id.sort) {
-            if (config.getSaleLevel().equals(Constant.bookLevel)) {
+            if (config.getSaleLevel().equals(Constants.bookLevel)) {
                 if (!sort) {
                     expandableListTitle.sort(Comparator.comparing(pair -> 100 - ((Book) pair.second).getSalePercent()));
                     sort = !sort;

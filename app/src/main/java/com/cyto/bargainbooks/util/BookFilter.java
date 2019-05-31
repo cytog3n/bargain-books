@@ -2,7 +2,7 @@ package com.cyto.bargainbooks.util;
 
 import android.content.Context;
 
-import com.cyto.bargainbooks.config.Config;
+import com.cyto.bargainbooks.storage.Config;
 import com.cyto.bargainbooks.model.Book;
 
 import java.util.ArrayList;

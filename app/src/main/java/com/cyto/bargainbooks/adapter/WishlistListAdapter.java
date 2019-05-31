@@ -20,7 +20,6 @@ public class WishlistListAdapter extends BaseAdapter {
     private final List<Pair> listTitle;
     private final SimpleDateFormat format = new SimpleDateFormat("yyyy.MM.dd");
 
-
     public WishlistListAdapter(Context context, List<Pair> listTitle) {
         this.context = context;
         this.listTitle = listTitle;
@@ -51,14 +50,11 @@ public class WishlistListAdapter extends BaseAdapter {
 
         Book b = (Book) (((Pair) getItem(position)).second);
 
-        String title = b.getTitle();
-        String author = b.getAuthor();
-
         TextView titleTextView = convertView.findViewById(R.id.title);
-        titleTextView.setText(title);
+        titleTextView.setText(b.getTitle());
 
         TextView authorTextView = convertView.findViewById(R.id.author);
-        authorTextView.setText(author);
+        authorTextView.setText(b.getAuthor());
 
         TextView updateDate = convertView.findViewById(R.id.last_updated_value);
         if (b.getLastUpdateDate() != null) {

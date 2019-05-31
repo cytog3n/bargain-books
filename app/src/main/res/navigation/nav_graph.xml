@@ -23,12 +23,6 @@
         tools:layout="@layout/fragment_search" />
 
     <fragment
-        android:id="@+id/AddBookFragment"
-        android:name="com.cyto.bargainbooks.fragment.AddBookFragment"
-        android:label="add_book_fragment"
-        tools:layout="@layout/fragment_add_book" />
-
-    <fragment
         android:id="@+id/ImportBooksFragment"
         android:name="com.cyto.bargainbooks.fragment.ImportBooksFragment"
         android:label="import_books_fragment"

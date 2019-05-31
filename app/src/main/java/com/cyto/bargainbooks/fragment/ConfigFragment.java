@@ -19,8 +19,8 @@ import android.widget.Switch;
 
 import com.cyto.bargainbooks.R;
 import com.cyto.bargainbooks.adapter.ConfigListAdapter;
-import com.cyto.bargainbooks.config.Config;
-import com.cyto.bargainbooks.config.Constant;
+import com.cyto.bargainbooks.config.Constants;
+import com.cyto.bargainbooks.storage.Config;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -101,7 +101,7 @@ public class ConfigFragment extends Fragment {
         ConfigListAdapter listAdapter = new ConfigListAdapter(context, listTitle);
         listView.setAdapter(listAdapter);
 
-        if (config.getSaleLevel().equals(Constant.bookLevel)) {
+        if (config.getSaleLevel().equals(Constants.bookLevel)) {
             saleLevelSwitch.setText(R.string.book_level);
             saleLevelSwitch.setChecked(false);
         } else {
@@ -114,10 +114,10 @@ public class ConfigFragment extends Fragment {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
                     saleLevelSwitch.setText(R.string.store_level);
-                    config.setSaleLevel(Constant.storeLevel);
+                    config.setSaleLevel(Constants.storeLevel);
                 } else {
                     saleLevelSwitch.setText(R.string.book_level);
-                    config.setSaleLevel(Constant.bookLevel);
+                    config.setSaleLevel(Constants.bookLevel);
                 }
             }
         });

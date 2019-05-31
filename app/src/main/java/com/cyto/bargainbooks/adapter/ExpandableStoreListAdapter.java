@@ -9,7 +9,7 @@ import android.widget.BaseExpandableListAdapter;
 import android.widget.TextView;
 
 import com.cyto.bargainbooks.R;
-import com.cyto.bargainbooks.config.Constant;
+import com.cyto.bargainbooks.config.Constants;
 import com.cyto.bargainbooks.model.Book;
 
 import java.util.List;
@@ -102,38 +102,13 @@ public class ExpandableStoreListAdapter extends BaseExpandableListAdapter {
 
         Integer count = (Integer) ((Pair) getGroup(listPosition)).second;
         String shopName = (String) ((Pair) getGroup(listPosition)).first;
-        shopName = Constant.storeMap.get(shopName);
+        shopName = Constants.storeMap.get(shopName);
 
         TextView shopNameTextView = convertView.findViewById(R.id.store_name);
         shopNameTextView.setText(shopName);
 
         TextView countTextView = convertView.findViewById(R.id.sale_count);
         countTextView.setText(count.toString());
-
-        /* String title = b.getTitle();
-        String author = b.getAuthor();
-        String off = b.getSalePercent() + "%";
-        String originalPrice = String.valueOf(b.getOriginalPrice());
-
-        TextView titleTextView = convertView.findViewById(R.id.title);
-        titleTextView.setText(title);
-
-        TextView authorTextView = convertView.findViewById(R.id.author);
-        authorTextView.setText(author);
-
-        TextView saleTextView = convertView.findViewById(R.id.off);
-        if (b.getSalePercent() == null) {
-            saleTextView.setText("");
-        } else {
-            saleTextView.setText(off);
-        }
-
-        TextView originalPriceTextView = convertView.findViewById(R.id.original_price_value);
-        if (b.getOriginalPrice() == null) {
-             originalPriceTextView.setText("");
-        } else {
-            originalPriceTextView.setText(originalPrice + " Ft");
-        } */
 
         return convertView;
     }

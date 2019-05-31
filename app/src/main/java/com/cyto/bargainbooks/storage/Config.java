@@ -1,14 +1,15 @@
-package com.cyto.bargainbooks.config;
+package com.cyto.bargainbooks.storage;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.cyto.bargainbooks.config.Constants;
 import com.google.gson.Gson;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class Config {
+public final class Config {
 
     private static final Gson gson = new Gson();
 
@@ -52,7 +53,7 @@ public class Config {
             } else {
                 config = new Config();
                 HashMap<String, Boolean> map = new HashMap<>();
-                for (String s: Constant.storeMap.keySet()) {
+                for (String s : Constants.storeMap.keySet()) {
                     map.put(s, true);
                 }
                 config.storeFilter = map;

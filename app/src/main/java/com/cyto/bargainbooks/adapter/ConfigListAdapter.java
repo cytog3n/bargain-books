@@ -11,8 +11,8 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import com.cyto.bargainbooks.R;
-import com.cyto.bargainbooks.config.Config;
-import com.cyto.bargainbooks.config.Constant;
+import com.cyto.bargainbooks.storage.Config;
+import com.cyto.bargainbooks.config.Constants;
 
 import java.util.List;
 
@@ -57,7 +57,7 @@ public class ConfigListAdapter extends BaseAdapter {
         TextView storeName = convertView.findViewById(R.id.store_name);
         Switch storeValue = convertView.findViewById(R.id.store_value);
 
-        storeName.setText(Constant.storeMap.get(p.first));
+        storeName.setText(Constants.storeMap.get(p.first));
         storeValue.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {

@@ -3,8 +3,7 @@ package com.cyto.bargainbooks.factory;
 import android.content.Context;
 
 import com.android.volley.toolbox.StringRequest;
-import com.cyto.bargainbooks.config.Config;
-import com.cyto.bargainbooks.config.Constant;
+import com.cyto.bargainbooks.config.Constants;
 import com.cyto.bargainbooks.model.Book;
 import com.cyto.bargainbooks.request.AlexandraRequest;
 import com.cyto.bargainbooks.request.AlomgyarRequest;
@@ -22,6 +21,7 @@ import com.cyto.bargainbooks.request.Szazad21Request;
 import com.cyto.bargainbooks.request.TTKOnlineRequest;
 import com.cyto.bargainbooks.request.handler.BookHandler;
 import com.cyto.bargainbooks.request.handler.ErrorHandler;
+import com.cyto.bargainbooks.storage.Config;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +38,7 @@ public class RequestFactory {
         List<StringRequest> requests = new ArrayList<>();
         Config c = Config.getInstance(context);
 
-        for (String storeName : Constant.storeMap.keySet()) {
+        for (String storeName : Constants.storeMap.keySet()) {
             Boolean filterOn = c.getStoreFilter().get(storeName);
             if (filterOn) {
                 switch (storeName) {
@@ -81,11 +81,9 @@ public class RequestFactory {
                     case "szazad21":
                         requests.add(new Szazad21Request(b, bh, eh).getStringRequest());
                         break;
-
                     case "ttkonline":
                         requests.add(new TTKOnlineRequest(b, bh, eh).getStringRequest());
                         break;
-
                     default: //nop
                         break;
                 }

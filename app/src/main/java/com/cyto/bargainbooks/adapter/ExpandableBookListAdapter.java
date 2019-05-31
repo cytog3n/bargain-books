@@ -10,7 +10,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.cyto.bargainbooks.R;
-import com.cyto.bargainbooks.config.Constant;
+import com.cyto.bargainbooks.config.Constants;
 import com.cyto.bargainbooks.model.Book;
 
 import java.util.Comparator;
@@ -54,7 +54,7 @@ public class ExpandableBookListAdapter extends BaseExpandableListAdapter {
         if (book.getStore() == null) {
             shopName.setText(context.getString(R.string.no_available_store));
         } else {
-            shopName.setText(Constant.storeMap.get(book.getStore()));
+            shopName.setText(Constants.storeMap.get(book.getStore()));
         }
 
         TextView off = convertView.findViewById(R.id.off);
@@ -130,29 +130,24 @@ public class ExpandableBookListAdapter extends BaseExpandableListAdapter {
             }
         }
 
-        String title = b.getTitle();
-        String author = b.getAuthor();
-        String off = b.getSalePercent() + "%";
-        String originalPrice = String.valueOf(b.getOriginalPrice());
-
         TextView titleTextView = convertView.findViewById(R.id.title);
-        titleTextView.setText(title);
+        titleTextView.setText(b.getTitle());
 
         TextView authorTextView = convertView.findViewById(R.id.author);
-        authorTextView.setText(author);
+        authorTextView.setText(b.getAuthor());
 
         TextView saleTextView = convertView.findViewById(R.id.off);
         if (b.getSalePercent() == null) {
             saleTextView.setText("");
         } else {
-            saleTextView.setText(off);
+            saleTextView.setText(b.getSalePercent() + "%");
         }
 
         TextView originalPriceTextView = convertView.findViewById(R.id.original_price_value);
         if (b.getOriginalPrice() == null) {
             originalPriceTextView.setText("");
         } else {
-            originalPriceTextView.setText(originalPrice + " Ft");
+            originalPriceTextView.setText(b.getOriginalPrice() + " Ft");
         }
 
         return convertView;

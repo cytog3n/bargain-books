@@ -13,19 +13,19 @@ import android.view.MenuItem;
 
 import androidx.navigation.Navigation;
 
+import com.cyto.bargainbooks.fragment.BookDetailFragment;
 import com.cyto.bargainbooks.fragment.ConfigFragment;
 import com.cyto.bargainbooks.fragment.ImportBooksFragment;
 import com.cyto.bargainbooks.fragment.SaleFragment;
 import com.cyto.bargainbooks.fragment.SearchFragment;
 import com.cyto.bargainbooks.fragment.WishlistFragment;
-import com.cyto.bargainbooks.model.Book;
 import com.cyto.bargainbooks.storage.BookSaleList;
 import com.cyto.bargainbooks.storage.BookWishlist;
 import com.cyto.bargainbooks.storage.Config;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, WishlistFragment.OnFragmentInteractionListener,
         SearchFragment.OnFragmentInteractionListener, SaleFragment.OnFragmentInteractionListener, ImportBooksFragment.OnFragmentInteractionListener,
-        ConfigFragment.OnFragmentInteractionListener {
+        ConfigFragment.OnFragmentInteractionListener, BookDetailFragment.OnFragmentInteractionListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

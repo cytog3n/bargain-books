@@ -2,8 +2,8 @@ package com.cyto.bargainbooks.util;
 
 import android.content.Context;
 
-import com.cyto.bargainbooks.storage.Config;
 import com.cyto.bargainbooks.model.Book;
+import com.cyto.bargainbooks.storage.Config;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +23,13 @@ public class BookFilter {
         input.forEach(book -> {
             Boolean b = config.getStoreFilter().get(book.getStore());
             if (b != null && b) {
-                output.add(book);
+                if (!book.getStore().equals("libri")) {
+                    output.add(book);
+                } else if (config.getShowLibri5PercentDeals()) {
+                    output.add(book);
+                } else if (book.getSalePercent() > 5L) {
+                    output.add(book);
+                }
             }
         });
 

@@ -38,8 +38,7 @@ public class ExpandableStoreListAdapter extends BaseExpandableListAdapter {
     }
 
     @Override
-    public View getChildView(int listPosition, final int expandedListPosition,
-                             boolean isLastChild, View convertView, ViewGroup parent) {
+    public View getChildView(int listPosition, final int expandedListPosition, boolean isLastChild, View convertView, ViewGroup parent) {
 
         final Book book = (Book) getChild(listPosition, expandedListPosition);
         if (convertView == null) {
@@ -56,16 +55,16 @@ public class ExpandableStoreListAdapter extends BaseExpandableListAdapter {
 
         TextView off = convertView.findViewById(R.id.off);
         if (book.getSalePercent() == null) {
-            off.setText("");
+            off.setText(context.getString(R.string.empty_string));
         } else {
-            off.setText("(" + book.getSalePercent() + "%)");
+            off.setText(String.format(context.getString(R.string.sale_percent_parenthesis), book.getSalePercent()));
         }
 
         TextView price = convertView.findViewById(R.id.price);
         if (book.getNewPrice() == null) {
-            price.setText("");
+            price.setText(context.getString(R.string.empty_string));
         } else {
-            price.setText(book.getNewPrice() + " Ft");
+            price.setText(String.format(context.getString(R.string.price_tag_huf), book.getNewPrice()));
         }
 
         return convertView;
@@ -92,8 +91,7 @@ public class ExpandableStoreListAdapter extends BaseExpandableListAdapter {
     }
 
     @Override
-    public View getGroupView(int listPosition, boolean isExpanded,
-                             View convertView, ViewGroup parent) {
+    public View getGroupView(int listPosition, boolean isExpanded, View convertView, ViewGroup parent) {
 
         if (convertView == null) {
             LayoutInflater layoutInflater = (LayoutInflater) this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);

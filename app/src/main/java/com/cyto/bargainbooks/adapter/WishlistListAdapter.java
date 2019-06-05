@@ -60,7 +60,7 @@ public class WishlistListAdapter extends BaseAdapter {
         if (b.getLastUpdateDate() != null) {
             updateDate.setText(format.format(b.getLastUpdateDate()));
         } else {
-            updateDate.setText("");
+            updateDate.setText(context.getString(R.string.empty_string));
         }
 
 

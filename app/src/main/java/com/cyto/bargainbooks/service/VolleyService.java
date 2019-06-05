@@ -12,10 +12,10 @@ public class VolleyService {
 
     private RequestQueue requestQueue;
 
-    private static Context context;
+    private final Context context;
 
     private VolleyService(Context context) {
-        VolleyService.context = context;
+        this.context = context;
         requestQueue = getRequestQueue();
     }
 

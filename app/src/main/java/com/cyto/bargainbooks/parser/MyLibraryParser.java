@@ -19,7 +19,7 @@ import java.util.List;
 public class MyLibraryParser {
 
     public List<Book> getBooks(InputStream stream) throws EncryptedDocumentException, IOException, InvalidFormatException {
-        List<Book> books = new ArrayList<Book>();
+        List<Book> books = new ArrayList<>();
 
         Workbook wb = WorkbookFactory.create(stream);
         Sheet sheet = wb.getSheetAt(1);

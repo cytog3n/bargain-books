@@ -3,27 +3,28 @@ package com.cyto.bargainbooks.fragment;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.util.Log;
-import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CompoundButton;
-import android.widget.ListView;
+import android.widget.LinearLayout;
 import android.widget.Switch;
+import android.widget.TextView;
 
 import com.cyto.bargainbooks.R;
-import com.cyto.bargainbooks.adapter.ConfigListAdapter;
 import com.cyto.bargainbooks.config.Constants;
 import com.cyto.bargainbooks.storage.Config;
 
+import org.apache.commons.collections4.map.HashedMap;
+
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class ConfigFragment extends Fragment {
@@ -34,7 +35,7 @@ public class ConfigFragment extends Fragment {
 
     private Config config;
 
-    private final List<Pair> listTitle = new ArrayList<>();
+    private Map<String, Object> optionsMap = new HashedMap<>();
 
     private Switch saleLevelSwitch;
 
@@ -66,6 +67,14 @@ public class ConfigFragment extends Fragment {
         int id = item.getItemId();
 
         if (id == R.id.action_save) {
+
+            config.setSaleLevel((String) optionsMap.get("saleLevel"));
+            config.setShowLibri5PercentDeals((Boolean) optionsMap.get("show5percent"));
+
+            for (String store : config.getStoreFilter().keySet()) {
+                config.getStoreFilter().replace(store, (Boolean) optionsMap.get(store));
+            }
+
             Snackbar.make(view, "Saved!", Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show();
             Config.saveConfigToSharedPreferences(getContext());
@@ -83,25 +92,18 @@ public class ConfigFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_config, container, false);
+        ((NavigationView) getActivity().findViewById(R.id.nav_view)).setCheckedItem(R.id.nav_config);
         config = Config.getInstance(getContext());
-
-        ListView listView = view.findViewById(R.id.listView);
+        optionsMap.clear();
         saleLevelSwitch = view.findViewById(R.id.saleLevelValue);
         Switch showLibri5PercentDealsSwitch = view.findViewById(R.id.libri5percentValue);
+        LinearLayout stores = view.findViewById(R.id.stores);
 
-        Context context = getActivity().getApplicationContext();
-
-        for (String s : config.getStoreFilter().keySet().stream().sorted(String::compareToIgnoreCase).collect(Collectors.toCollection(ArrayList::new))) {
-            listTitle.add(new Pair(s, config.getStoreFilter().get(s)));
-        }
-
-        ConfigListAdapter listAdapter = new ConfigListAdapter(context, listTitle);
-        listView.setAdapter(listAdapter);
-
-        if (config.getSaleLevel().equals(Constants.bookLevel)) {
+        optionsMap.put("saleLevel", config.getSaleLevel());
+        optionsMap.put("show5percent", config.getShowLibri5PercentDeals());
+        if (optionsMap.get("saleLevel").equals(Constants.bookLevel)) {
             saleLevelSwitch.setText(R.string.book_level);
             saleLevelSwitch.setChecked(false);
         } else {
@@ -109,26 +111,19 @@ public class ConfigFragment extends Fragment {
             saleLevelSwitch.setChecked(true);
         }
 
-        saleLevelSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    saleLevelSwitch.setText(R.string.store_level);
-                    config.setSaleLevel(Constants.storeLevel);
-                } else {
-                    saleLevelSwitch.setText(R.string.book_level);
-                    config.setSaleLevel(Constants.bookLevel);
-                }
+        saleLevelSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                saleLevelSwitch.setText(R.string.store_level);
+                optionsMap.replace("saleLevel", Constants.storeLevel);
+            } else {
+                saleLevelSwitch.setText(R.string.book_level);
+                optionsMap.replace("saleLevel", Constants.bookLevel);
             }
         });
+        showLibri5PercentDealsSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> optionsMap.replace("show5percent", isChecked));
+        showLibri5PercentDealsSwitch.setChecked((Boolean) optionsMap.get("show5percent"));
 
-        showLibri5PercentDealsSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                config.setShowLibri5PercentDeals(isChecked);
-            }
-        });
-        showLibri5PercentDealsSwitch.setChecked(config.getShowLibri5PercentDeals());
+        populateFilters(inflater, stores);
 
         return view;
     }
@@ -170,6 +165,23 @@ public class ConfigFragment extends Fragment {
      */
     public interface OnFragmentInteractionListener {
         void onFragmentInteraction(Uri uri);
+    }
+
+    /**
+     * Populate the filters into the given LinearLayout
+     */
+    private void populateFilters(LayoutInflater inflater, LinearLayout stores) {
+
+        for (String store : config.getStoreFilter().keySet().stream().sorted(String::compareToIgnoreCase).collect(Collectors.toCollection(ArrayList::new))) {
+            View view = inflater.inflate(R.layout.config_filter_list_item, stores, false);
+            optionsMap.put(store, config.getStoreFilter().get(store));
+
+            ((TextView) view.findViewById(R.id.store_name)).setText(Constants.storeMap.get(store));
+            Switch storeValue = view.findViewById(R.id.store_value);
+            storeValue.setOnCheckedChangeListener((buttonView, isChecked) -> optionsMap.replace(store, isChecked));
+            storeValue.setChecked((Boolean) optionsMap.get(store));
+            stores.addView(view);
+        }
     }
 
 }

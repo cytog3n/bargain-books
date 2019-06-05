@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_gravity="top"
     app:layout_scrollFlags="scroll"
     tools:context=".fragment.ConfigFragment">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:background="@color/colorBackground"
         android:divider="?attr/dividerHorizontal"
         android:dividerPadding="1dp"
-        android:gravity="center"
+        android:gravity="top"
         android:orientation="vertical"
         android:showDividers="middle">
 
@@ -36,14 +37,14 @@
 
             <Switch
                 android:id="@+id/saleLevelValue"
-                android:theme="@style/SCBSwitch"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:paddingEnd="40dip"
                 android:textOn="@string/book_level"
                 android:textSize="14sp"
-                android:textStyle="italic" />
+                android:textStyle="italic"
+                android:theme="@style/SCBSwitch" />
         </LinearLayout>
 
         <LinearLayout
@@ -65,15 +66,16 @@
 
             <Switch
                 android:id="@+id/libri5percentValue"
-                android:theme="@style/SCBSwitch"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:paddingEnd="40dip"
-                android:textOn="@string/book_level" />
+                android:textOn="@string/book_level"
+                android:theme="@style/SCBSwitch" />
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/stores"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
@@ -89,18 +91,6 @@
                 android:textColor="@android:color/black"
                 android:textSize="18sp" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <ListView
-                    android:id="@+id/listView"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:divider="@android:color/darker_gray"
-                    android:dividerHeight="0.5dp"></ListView>
-            </LinearLayout>
         </LinearLayout>
     </LinearLayout>
-</android.support.constraint.ConstraintLayout>
+</ScrollView>

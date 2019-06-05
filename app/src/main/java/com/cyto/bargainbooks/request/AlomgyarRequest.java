@@ -111,7 +111,7 @@ public class AlomgyarRequest extends AbstractRequest {
             return -2L;
         }
 
-        Long percent = Math.round((this.getBookNewPrice().doubleValue() / this.getBookOldPrice().doubleValue()) * 100);
+        long percent = Math.round((this.getBookNewPrice().doubleValue() / this.getBookOldPrice().doubleValue()) * 100);
         return 100 - percent;
 
     }

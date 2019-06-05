@@ -34,4 +34,10 @@
         android:label="config_fragment"
         tools:layout="@layout/fragment_config" />
 
+    <fragment
+        android:id="@+id/BookDetailFragment"
+        android:name="com.cyto.bargainbooks.fragment.BookDetailFragment"
+        android:label="search_fragment"
+        tools:layout="@layout/fragment_book_detail" />
+
 </navigation>

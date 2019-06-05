@@ -4,6 +4,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
@@ -15,6 +16,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+
+import androidx.navigation.Navigation;
 
 import com.cyto.bargainbooks.R;
 import com.cyto.bargainbooks.adapter.WishlistListAdapter;
@@ -77,12 +80,12 @@ public class WishlistFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_wishlist, container, false);
+        ((NavigationView) getActivity().findViewById(R.id.nav_view)).setCheckedItem(R.id.nav_wishlist);
+        listTitle.clear();
 
         ListView listView = view.findViewById(R.id.listView);
-        Context context = getActivity().getApplicationContext();
 
         List<Book> books = BookWishlist.getBooks();
         Set<String> isbns = new HashSet<>();
@@ -95,9 +98,16 @@ public class WishlistFragment extends Fragment {
             }
         }
 
-        WishlistListAdapter wishlistListAdapter = new WishlistListAdapter(context, listTitle);
+        WishlistListAdapter wishlistListAdapter = new WishlistListAdapter(getContext(), listTitle);
         wishlistListAdapter.notifyDataSetChanged();
         listView.setAdapter(wishlistListAdapter);
+
+        listView.setOnItemClickListener((parent, view1, position, id) -> {
+            Book b = books.get(position);
+            Bundle bundle = new Bundle();
+            bundle.putString("isbn", b.getISBN());
+            Navigation.findNavController(getActivity().findViewById(R.id.nav_host_fragment)).navigate(R.id.BookDetailFragment, bundle);
+        });
 
         return view;
     }
@@ -141,6 +151,9 @@ public class WishlistFragment extends Fragment {
         void onFragmentInteraction(Uri uri);
     }
 
+    /**
+     * Refreshes the fragment, so the onCreateView method will initialize the whole fragment.
+     */
     private void refreshFragment() {
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         if (Build.VERSION.SDK_INT >= 26) {

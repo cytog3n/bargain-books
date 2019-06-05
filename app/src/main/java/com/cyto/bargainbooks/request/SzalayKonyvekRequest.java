@@ -114,7 +114,7 @@ public class SzalayKonyvekRequest extends  AbstractRequest {
         }
 
         if (this.getBookNewPrice() > 0) {
-            Long percent = Math.round((this.getBookNewPrice().doubleValue() / this.getBookOldPrice().doubleValue()) * 100);
+            long percent = Math.round((this.getBookNewPrice().doubleValue() / this.getBookOldPrice().doubleValue()) * 100);
             return 100 - percent;
         } else {
             return 0L;

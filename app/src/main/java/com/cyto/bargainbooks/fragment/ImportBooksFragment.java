@@ -22,14 +22,10 @@ import com.cyto.bargainbooks.R;
 import com.cyto.bargainbooks.model.Book;
 import com.cyto.bargainbooks.parser.MyLibraryParser;
 import com.cyto.bargainbooks.storage.BookWishlist;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.io.FileInputStream;
-import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.List;
 
 public class ImportBooksFragment extends Fragment {
@@ -41,11 +37,6 @@ public class ImportBooksFragment extends Fragment {
     private static final int READ_REQUEST_CODE = 42;
 
     private Uri uri;
-
-    private final Gson gson = new Gson();
-
-    private final Type listType = new TypeToken<ArrayList<Book>>() {
-    }.getType();
 
     public ImportBooksFragment() {
         // Required empty public constructor
@@ -71,9 +62,9 @@ public class ImportBooksFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_import_books, container, false);
+        ((NavigationView) getActivity().findViewById(R.id.nav_view)).setCheckedItem(R.id.nav_import_books);
 
         Button send = view.findViewById(R.id.send);
         Button browse = view.findViewById(R.id.browse);
@@ -117,16 +108,13 @@ public class ImportBooksFragment extends Fragment {
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode,
-                                 Intent resultData) {
-
+    public void onActivityResult(int requestCode, int resultCode, Intent resultData) {
         if (requestCode == READ_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             uri = null;
             if (resultData != null) {
                 uri = resultData.getData();
                 String[] s = uri.getPath().split("/");
                 browsePlaceholder.setText(s[s.length - 1]);
-                // fileName = s[s.length - 1];
                 Log.d("File selected: ", uri.getPath());
             }
         }

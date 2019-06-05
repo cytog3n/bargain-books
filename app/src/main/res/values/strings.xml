@@ -18,10 +18,6 @@
     <string name="original_price">Original price</string>
     <string name="action_refresh">Refresh</string>
     <string name="action_clear">Clear</string>
-    <string name="add_book_isbn_placeholder">ISBN</string>
-    <string name="add_book_title_placeholder">Title</string>
-    <string name="add_book_author_placeholder">Author</string>
-    <string name="add_book_button">Add book</string>
     <string name="no_available_store">This is not available</string>
     <string name="wishlist_store_view">Store view</string>
     <string name="wishlist_book_view">Book view</string>
@@ -35,4 +31,15 @@
     <string name="store_filter">Store filter</string>
     <string name="date_placeholder">2018.05.23</string>
     <string name="sort">Sort</string>
+    <string name="isbn_placeholder">9789639910256</string>
+    <string name="lastUpdated">Last updated</string>
+    <string name="isbn_label">ISBN</string>
+
+    <string name="empty_string"></string>
+    <string name="sale_percent">%d%%</string>
+    <string name="sale_percent_parenthesis">(%d%%)</string>
+    <string name="price_tag_huf">%d Ft</string>
+    <string name="query_finished_sec">Finished in %d seconds</string>
+    <string name="sorted_alphabet">Sorted alphabetically</string>
+    <string name="sorted_discount">Sorted by discount</string>
 </resources>

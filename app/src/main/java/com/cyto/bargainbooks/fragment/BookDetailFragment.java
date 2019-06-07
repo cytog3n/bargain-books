@@ -25,7 +25,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.cyto.bargainbooks.R;
 import com.cyto.bargainbooks.config.Constants;
-import com.cyto.bargainbooks.factory.RequestFactory;
+import com.cyto.bargainbooks.factory.BookRequestFactory;
 import com.cyto.bargainbooks.model.Book;
 import com.cyto.bargainbooks.request.handler.BookHandler;
 import com.cyto.bargainbooks.request.handler.ErrorHandler;
@@ -101,7 +101,7 @@ public class BookDetailFragment extends Fragment {
 
             VolleyService vs = VolleyService.getInstance(getContext());
             startDate = new Date();
-            RequestFactory rf = new RequestFactory(getContext());
+            BookRequestFactory rf = new BookRequestFactory(getContext());
             progressBar.setVisibility(View.VISIBLE);
             List<StringRequest> srs = rf.getRequests(book, bh, eh);
             for (StringRequest sr : srs) {

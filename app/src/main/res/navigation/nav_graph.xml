@@ -40,4 +40,10 @@
         android:label="search_fragment"
         tools:layout="@layout/fragment_book_detail" />
 
+    <fragment
+        android:id="@+id/ImportLibriWishListFragment"
+        android:name="com.cyto.bargainbooks.fragment.ImportLibriWishlistFragment"
+        android:label="import_libri_wishlist_fragment"
+        tools:layout="@layout/fragment_import_libri_wishlist" />
+
 </navigation>

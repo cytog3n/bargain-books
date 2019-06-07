@@ -3,6 +3,7 @@ package com.cyto.bargainbooks.request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.cyto.bargainbooks.config.Constants;
 import com.cyto.bargainbooks.model.Book;
 import com.cyto.bargainbooks.request.handler.BookHandler;
 import com.cyto.bargainbooks.request.handler.ErrorHandler;
@@ -15,22 +16,18 @@ import org.jsoup.nodes.Element;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-public class MaiKonyvRequest extends AbstractRequest {
+public class TTKOnlineBookRequest extends AbstractBookRequest {
 
     private Element detail;
 
-    private String url = null;
+    private Book book;
 
     private final BookHandler bookHandler;
 
     private final ErrorHandler errorHandler;
 
-    private Book book;
-
-    public MaiKonyvRequest(@NotNull Book book, @NotNull BookHandler bh, ErrorHandler eh) {
+    public TTKOnlineBookRequest(@NotNull Book book, @NotNull BookHandler bh, ErrorHandler eh) {
         this.book = book;
         this.bookHandler = bh;
         this.errorHandler = eh;
@@ -41,7 +38,7 @@ public class MaiKonyvRequest extends AbstractRequest {
 
         Map<String, String> params = new HashMap<>();
         params.put("isbn", book.getISBN());
-        String search = "https://www.mai-konyv.hu/index.php?route=product/list&keyword=${isbn}&category_id=57";
+        String search = "https://www.tkkonline.hu/index.php?category_id=0&search=${isbn}+&submit_search=&sub_category=1&route=product%2Fsearch&description=true";
         String url = UrlUtil.ApplyParameters(search, params);
 
         return new StringRequest(url, listener, failedRequestListener);
@@ -51,16 +48,7 @@ public class MaiKonyvRequest extends AbstractRequest {
         @Override
         public void onResponse(String response) {
             Document doc = Jsoup.parse(response);
-            detail = doc.selectFirst("div.row.product-content-column-left");
-
-            if (detail != null) {
-                String urlRegex = "<link href=\"(.+)\" rel=\"canonical\">";
-                Pattern p = Pattern.compile(urlRegex);
-                Matcher m = p.matcher(response);
-                if (m.find()) {
-                    url = m.group(1);
-                }
-            }
+            detail = doc.selectFirst("div#products");
 
             book = createBook(book.getISBN(), book.getAuthor(), book.getTitle());
             bookHandler.handleBook(book);
@@ -70,7 +58,7 @@ public class MaiKonyvRequest extends AbstractRequest {
     private final Response.ErrorListener failedRequestListener = new Response.ErrorListener() {
         @Override
         public void onErrorResponse(VolleyError error) {
-            errorListener.onErrorResponse(error);
+            Constants.errorListener.onErrorResponse(error);
             if (errorHandler != null) {
                 errorHandler.handleError(error);
             }
@@ -84,11 +72,7 @@ public class MaiKonyvRequest extends AbstractRequest {
             return -2L;
         }
 
-        if (detail.selectFirst("a.notify-request") != null) { // Available or not
-            return -1L;
-        }
-
-        Element price = detail.selectFirst("span.price.price_original_color.product_table_original");
+        Element price = detail.selectFirst("span.price-old");
         return price == null ? -1L : extractNumbers(price.html());
     }
 
@@ -99,11 +83,7 @@ public class MaiKonyvRequest extends AbstractRequest {
             return -2L;
         }
 
-        if (detail.selectFirst("a.notify-request") != null) { // Available or not
-            return -1L;
-        }
-
-        Element price = detail.selectFirst("span.price.price_special_color.product_table_special");
+        Element price = detail.selectFirst("span.price-new");
         return price == null ? -1L : extractNumbers(price.html());
     }
 
@@ -114,22 +94,24 @@ public class MaiKonyvRequest extends AbstractRequest {
             return -2L;
         }
 
-        if (detail.selectFirst("a.notify-request") != null) { // Available or not
-            return -1L;
-        }
-
-        Element perc = detail.selectFirst("span.decrease_amount");
-        return perc == null ? -1L : extractNumbers(perc.html());
+        long percent = Math.round((this.getBookNewPrice().doubleValue() / this.getBookOldPrice().doubleValue()) * 100);
+        return 100 - percent;
     }
 
     @Override
     protected String getUrl() {
-        return detail == null ? null : url;
+        if (detail != null) {
+            Element url = detail.selectFirst("a.img");
+            if (url != null) {
+                return url.attr("href");
+            }
+        }
+        return null;
     }
 
     @Override
     protected String getName() {
-        return "maikonyv";
+        return "ttkonline";
     }
 
 }

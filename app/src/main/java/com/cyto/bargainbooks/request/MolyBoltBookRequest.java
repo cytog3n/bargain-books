@@ -3,6 +3,7 @@ package com.cyto.bargainbooks.request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.cyto.bargainbooks.config.Constants;
 import com.cyto.bargainbooks.model.Book;
 import com.cyto.bargainbooks.request.handler.BookHandler;
 import com.cyto.bargainbooks.request.handler.ErrorHandler;
@@ -15,12 +16,8 @@ import org.jsoup.nodes.Element;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-public class LiraRequest extends AbstractRequest {
-
-    private String url;
+public class MolyBoltBookRequest extends AbstractBookRequest {
 
     private Element detail;
 
@@ -30,7 +27,7 @@ public class LiraRequest extends AbstractRequest {
 
     private Book book;
 
-    public LiraRequest(@NotNull Book book, @NotNull BookHandler bh, ErrorHandler eh) {
+    public MolyBoltBookRequest(@NotNull Book book, @NotNull BookHandler bh, ErrorHandler eh) {
         this.book = book;
         this.bookHandler = bh;
         this.errorHandler = eh;
@@ -41,7 +38,7 @@ public class LiraRequest extends AbstractRequest {
 
         Map<String, String> params = new HashMap<>();
         params.put("isbn", book.getISBN());
-        String search = "https://www.lira.hu/hu/reszletes_kereso?listtype=1&listorder=release_date&listdirection=desc&listpagenumber=20&listcurrentpage=0&detaled_search_category=001&detaled_search_title=&detaled_search_isbn=${isbn}&detaled_search_year=&detaled_search_price1=&detaled_search_price2=&detaled_search_author=&detaled_search_publisher=&detaled_search_description=&detaled_search_series=&detaled_search_labels=";
+        String search = "https://www.molybolt.hu/index.php?BODY=Search&OP=ISBNSearch&isbn=${isbn}";
         String url = UrlUtil.ApplyParameters(search, params);
 
         return new StringRequest(url, listener, failedRequestListener);
@@ -51,16 +48,7 @@ public class LiraRequest extends AbstractRequest {
         @Override
         public void onResponse(String response) {
             Document doc = Jsoup.parse(response);
-            detail = doc.selectFirst("div.detail_item");
-
-            if (detail != null) {
-                String urlRegex = "<link rel=\"canonical\" href=\"(.+)\" \\/>";
-                Pattern p = Pattern.compile(urlRegex);
-                Matcher m = p.matcher(response);
-                if (m.find()) {
-                    url = m.group(1);
-                }
-            }
+            detail = doc.selectFirst("table#products");
 
             book = createBook(book.getISBN(), book.getAuthor(), book.getTitle());
             bookHandler.handleBook(book);
@@ -70,7 +58,7 @@ public class LiraRequest extends AbstractRequest {
     private final Response.ErrorListener failedRequestListener = new Response.ErrorListener() {
         @Override
         public void onErrorResponse(VolleyError error) {
-            errorListener.onErrorResponse(error);
+            Constants.errorListener.onErrorResponse(error);
             if (errorHandler != null) {
                 errorHandler.handleError(error);
             }
@@ -84,7 +72,7 @@ public class LiraRequest extends AbstractRequest {
             return -2L;
         }
 
-        Element price = detail.selectFirst("div.price.text-left");
+        Element price = detail.selectFirst("td.boltiartd nobr");
         return price == null ? -1L : extractNumbers(price.html());
     }
 
@@ -95,7 +83,7 @@ public class LiraRequest extends AbstractRequest {
             return -2L;
         }
 
-        Element price = detail.selectFirst("div.discounted_price.text-left");
+        Element price = detail.selectFirst("td.internetesartd nobr");
         return price == null ? -1L : extractNumbers(price.html());
     }
 
@@ -106,18 +94,25 @@ public class LiraRequest extends AbstractRequest {
             return -2L;
         }
 
-        Element perc = detail.selectFirst("div.percent.text-left");
-        return perc == null ? -1L : extractNumbers(perc.html());
+        long percent = Math.round((this.getBookNewPrice().doubleValue() / this.getBookOldPrice().doubleValue()) * 100);
+        return 100 - percent;
     }
 
     @Override
     protected String getUrl() {
-        return detail == null ? null : url;
+        if (detail != null) {
+            Element url = detail.selectFirst("td a");
+            if (url != null) {
+                String base = "https://www.molybolt.hu/";
+                return base + url.attr("href");
+            }
+        }
+        return null;
     }
 
     @Override
     protected String getName() {
-        return "lira";
+        return "molybolt";
     }
 
 }

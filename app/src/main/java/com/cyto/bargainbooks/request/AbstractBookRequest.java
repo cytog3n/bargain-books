@@ -11,7 +11,7 @@ import com.android.volley.TimeoutError;
 import com.android.volley.toolbox.StringRequest;
 import com.cyto.bargainbooks.model.Book;
 
-public abstract class AbstractRequest {
+public abstract class AbstractBookRequest {
 
     protected abstract String getName();
 
@@ -39,18 +39,6 @@ public abstract class AbstractRequest {
     }
 
     public abstract StringRequest getStringRequest();
-
-    protected final Response.ErrorListener errorListener = error -> {
-        if (error instanceof TimeoutError || error instanceof NoConnectionError) {
-            Log.e("TimeoutError | NoConnectionError", "Check your connection");
-        } else if (error instanceof ServerError) {
-            Log.e("NetworkError", "Server responded with an error response");
-        } else if (error instanceof NetworkError) {
-            Log.e("NetworkError", "There was a network error");
-        } else if (error instanceof ParseError) {
-            Log.e("ParseError", "Unable to parse the response");
-        }
-    };
 
     protected Long extractNumbers(String price) {
         return Long.valueOf(price.replaceAll("\\D+", ""));

@@ -3,6 +3,7 @@ package com.cyto.bargainbooks.request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.cyto.bargainbooks.config.Constants;
 import com.cyto.bargainbooks.model.Book;
 import com.cyto.bargainbooks.request.handler.BookHandler;
 import com.cyto.bargainbooks.request.handler.ErrorHandler;
@@ -16,7 +17,7 @@ import org.jsoup.nodes.Element;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Book24Request extends AbstractRequest {
+public class AlomgyarBookRequest extends AbstractBookRequest {
 
     private Element detail;
 
@@ -26,7 +27,7 @@ public class Book24Request extends AbstractRequest {
 
     private Book book;
 
-    public Book24Request(@NotNull Book book, @NotNull BookHandler bh, ErrorHandler eh) {
+    public AlomgyarBookRequest(@NotNull Book book, @NotNull BookHandler bh, ErrorHandler eh) {
         this.book = book;
         this.bookHandler = bh;
         this.errorHandler = eh;
@@ -37,7 +38,7 @@ public class Book24Request extends AbstractRequest {
 
         Map<String, String> params = new HashMap<>();
         params.put("isbn", book.getISBN());
-        String search = "https://www.book24.hu/kereses.php?search=${isbn}";
+        String search = "https://alomgyar.hu/kereses?k=${isbn}";
         String url = UrlUtil.ApplyParameters(search, params);
 
         return new StringRequest(url, listener, failedRequestListener);
@@ -47,9 +48,9 @@ public class Book24Request extends AbstractRequest {
         @Override
         public void onResponse(String response) {
             Document doc = Jsoup.parse(response);
-            detail = doc.selectFirst("article.product-item");
+            detail = doc.selectFirst("form.card.bookcard");
 
-            if (detail != null && detail.selectFirst("a[title='Készletfigyelés']") != null) {
+            if (detail != null && detail.selectFirst("input[name='elojegyez']") != null) {
                 detail = null;
             }
 
@@ -61,7 +62,7 @@ public class Book24Request extends AbstractRequest {
     private final Response.ErrorListener failedRequestListener = new Response.ErrorListener() {
         @Override
         public void onErrorResponse(VolleyError error) {
-            errorListener.onErrorResponse(error);
+            Constants.errorListener.onErrorResponse(error);
             if (errorHandler != null) {
                 errorHandler.handleError(error);
             }
@@ -75,7 +76,7 @@ public class Book24Request extends AbstractRequest {
             return -2L;
         }
 
-        Element price = detail.selectFirst("span.oldprice");
+        Element price = detail.selectFirst("div.ui.red.sub.header.strikethough");
         return price == null ? -1L : extractNumbers(price.html());
     }
 
@@ -86,8 +87,22 @@ public class Book24Request extends AbstractRequest {
             return -2L;
         }
 
-        Element price = detail.selectFirst("span.currentprice");
-        return price == null ? -1L : extractNumbers(price.html());
+        Element price = detail.selectFirst("h2.ui.header.price");
+
+        if (price == null) {
+            return -1L;
+        }
+
+        price = price.clone();
+        Element oldPrice = price.selectFirst("div.ui.red.sub.header.strikethough");
+
+        if (oldPrice == null) {
+            return -1L;
+        } else {
+            oldPrice.remove();
+        }
+
+        return extractNumbers(price.html());
     }
 
     @Override
@@ -97,16 +112,17 @@ public class Book24Request extends AbstractRequest {
             return -2L;
         }
 
-        Element perc = detail.selectFirst("div.discount-badge");
-        return perc == null ? -1L : extractNumbers(perc.html());
+        long percent = Math.round((this.getBookNewPrice().doubleValue() / this.getBookOldPrice().doubleValue()) * 100);
+        return 100 - percent;
+
     }
 
     @Override
     protected String getUrl() {
         if (detail != null) {
-            Element url = detail.selectFirst("a.pi-cover");
+            Element url = detail.selectFirst("a");
             if (url != null) {
-                return detail.baseUri() + url.attr("href");
+                return url.attr("href");
             }
         }
         return null;
@@ -114,6 +130,7 @@ public class Book24Request extends AbstractRequest {
 
     @Override
     protected String getName() {
-        return "book24";
+        return "alomgyar";
     }
+
 }

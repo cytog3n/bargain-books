@@ -16,6 +16,7 @@ import androidx.navigation.Navigation;
 import com.cyto.bargainbooks.fragment.BookDetailFragment;
 import com.cyto.bargainbooks.fragment.ConfigFragment;
 import com.cyto.bargainbooks.fragment.ImportBooksFragment;
+import com.cyto.bargainbooks.fragment.ImportLibriWishlistFragment;
 import com.cyto.bargainbooks.fragment.SaleFragment;
 import com.cyto.bargainbooks.fragment.SearchFragment;
 import com.cyto.bargainbooks.fragment.WishlistFragment;
@@ -25,7 +26,7 @@ import com.cyto.bargainbooks.storage.Config;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, WishlistFragment.OnFragmentInteractionListener,
         SearchFragment.OnFragmentInteractionListener, SaleFragment.OnFragmentInteractionListener, ImportBooksFragment.OnFragmentInteractionListener,
-        ConfigFragment.OnFragmentInteractionListener, BookDetailFragment.OnFragmentInteractionListener {
+        ConfigFragment.OnFragmentInteractionListener, BookDetailFragment.OnFragmentInteractionListener, ImportLibriWishlistFragment.OnFragmentInteractionListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +76,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             Navigation.findNavController(findViewById(R.id.nav_host_fragment)).navigate(R.id.ImportBooksFragment);
         } else if (id == R.id.nav_config) {
             Navigation.findNavController(findViewById(R.id.nav_host_fragment)).navigate(R.id.ConfigFragment);
+        } else if (id == R.id.nav_import_libri_books) {
+            Navigation.findNavController(findViewById(R.id.nav_host_fragment)).navigate(R.id.ImportLibriWishListFragment);
         }
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);

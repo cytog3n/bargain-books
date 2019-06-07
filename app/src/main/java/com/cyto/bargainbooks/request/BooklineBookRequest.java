@@ -3,6 +3,7 @@ package com.cyto.bargainbooks.request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.cyto.bargainbooks.config.Constants;
 import com.cyto.bargainbooks.model.Book;
 import com.cyto.bargainbooks.request.handler.BookHandler;
 import com.cyto.bargainbooks.request.handler.ErrorHandler;
@@ -16,7 +17,9 @@ import org.jsoup.nodes.Element;
 import java.util.HashMap;
 import java.util.Map;
 
-public class KonyvudvarRequest extends AbstractRequest {
+public class BooklineBookRequest extends AbstractBookRequest {
+
+    // private String search = "https://bookline.hu/search/search.action?searchfield=${isbn}&includeEbooks=false";
 
     private Element detail;
 
@@ -26,7 +29,7 @@ public class KonyvudvarRequest extends AbstractRequest {
 
     private Book book;
 
-    public KonyvudvarRequest(@NotNull Book book, @NotNull BookHandler bh, ErrorHandler eh) {
+    public BooklineBookRequest(@NotNull Book book, @NotNull BookHandler bh, ErrorHandler eh) {
         this.book = book;
         this.bookHandler = bh;
         this.errorHandler = eh;
@@ -37,7 +40,7 @@ public class KonyvudvarRequest extends AbstractRequest {
 
         Map<String, String> params = new HashMap<>();
         params.put("isbn", book.getISBN());
-        String search = "https://konyvudvar.net/index.php?route=product/search&search=${isbn}";
+        String search = "https://bookline.hu/search/advancedSearch.action?tokenType=and&isbn=${isbn}&page=1";
         String url = UrlUtil.ApplyParameters(search, params);
 
         return new StringRequest(url, listener, failedRequestListener);
@@ -47,7 +50,7 @@ public class KonyvudvarRequest extends AbstractRequest {
         @Override
         public void onResponse(String response) {
             Document doc = Jsoup.parse(response);
-            detail = doc.selectFirst("div.main-products.product-list");
+            detail = doc.selectFirst("div.t-product-detailed.o-product.l-flex.l-gutter-mb");
 
             book = createBook(book.getISBN(), book.getAuthor(), book.getTitle());
             bookHandler.handleBook(book);
@@ -57,7 +60,7 @@ public class KonyvudvarRequest extends AbstractRequest {
     private final Response.ErrorListener failedRequestListener = new Response.ErrorListener() {
         @Override
         public void onErrorResponse(VolleyError error) {
-            errorListener.onErrorResponse(error);
+            Constants.errorListener.onErrorResponse(error);
             if (errorHandler != null) {
                 errorHandler.handleError(error);
             }
@@ -71,7 +74,7 @@ public class KonyvudvarRequest extends AbstractRequest {
             return -2L;
         }
 
-        Element price = detail.selectFirst("span.eredeti-ar-7");
+        Element price = detail.selectFirst("span.o-product__old-price");
         return price == null ? -1L : extractNumbers(price.html());
     }
 
@@ -82,7 +85,7 @@ public class KonyvudvarRequest extends AbstractRequest {
             return -2L;
         }
 
-        Element price = detail.selectFirst("span.price-new");
+        Element price = detail.selectFirst("span.o-product__new-price");
         return price == null ? -1L : extractNumbers(price.html());
     }
 
@@ -93,7 +96,7 @@ public class KonyvudvarRequest extends AbstractRequest {
             return -2L;
         }
 
-        Element perc = detail.selectFirst("span.label-sale2");
+        Element perc = detail.select("div.o-product__discount").first();
         return perc == null ? -1L : extractNumbers(perc.html());
     }
 
@@ -102,7 +105,8 @@ public class KonyvudvarRequest extends AbstractRequest {
         if (detail != null) {
             Element url = detail.selectFirst("a");
             if (url != null) {
-                return url.attr("href");
+                String base = "https://bookline.hu";
+                return base + url.attr("href");
             }
         }
         return null;
@@ -110,7 +114,6 @@ public class KonyvudvarRequest extends AbstractRequest {
 
     @Override
     protected String getName() {
-        return "konyvudvar";
+        return "bookline";
     }
-
 }

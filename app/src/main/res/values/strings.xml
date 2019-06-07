@@ -42,4 +42,13 @@
     <string name="query_finished_sec">Finished in %d seconds</string>
     <string name="sorted_alphabet">Sorted alphabetically</string>
     <string name="sorted_discount">Sorted by discount</string>
+    <string name="title_libri_import">Import books from (Libri) public wishlist</string>
+    <string name="Import">Import </string>
+    <string name="query">Query</string>
+    <string name="libriImportError">Looks empty. :(</string>
+    <string name="importing_x_books">Importing %d books</string>
+    <string name="empty_url_error">Please give a valid URL for your public wishlist</string>
+    <string name="import_libri_wishlist">Import Libri wishlist</string>
+    <string name="import_finished">Import finished</string>
+
 </resources>

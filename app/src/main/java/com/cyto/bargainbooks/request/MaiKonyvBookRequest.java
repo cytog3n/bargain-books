@@ -3,6 +3,7 @@ package com.cyto.bargainbooks.request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.cyto.bargainbooks.config.Constants;
 import com.cyto.bargainbooks.model.Book;
 import com.cyto.bargainbooks.request.handler.BookHandler;
 import com.cyto.bargainbooks.request.handler.ErrorHandler;
@@ -15,10 +16,14 @@ import org.jsoup.nodes.Element;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-public class Numero7Request extends AbstractRequest {
+public class MaiKonyvBookRequest extends AbstractBookRequest {
 
     private Element detail;
+
+    private String url = null;
 
     private final BookHandler bookHandler;
 
@@ -26,7 +31,7 @@ public class Numero7Request extends AbstractRequest {
 
     private Book book;
 
-    public Numero7Request(@NotNull Book book, @NotNull BookHandler bh, ErrorHandler eh) {
+    public MaiKonyvBookRequest(@NotNull Book book, @NotNull BookHandler bh, ErrorHandler eh) {
         this.book = book;
         this.bookHandler = bh;
         this.errorHandler = eh;
@@ -37,7 +42,7 @@ public class Numero7Request extends AbstractRequest {
 
         Map<String, String> params = new HashMap<>();
         params.put("isbn", book.getISBN());
-        String search = "https://www.numero7.com/search_responsive.pl?s=${isbn}";
+        String search = "https://www.mai-konyv.hu/index.php?route=product/list&keyword=${isbn}&category_id=57";
         String url = UrlUtil.ApplyParameters(search, params);
 
         return new StringRequest(url, listener, failedRequestListener);
@@ -47,7 +52,16 @@ public class Numero7Request extends AbstractRequest {
         @Override
         public void onResponse(String response) {
             Document doc = Jsoup.parse(response);
-            detail = doc.selectFirst("div.item");
+            detail = doc.selectFirst("div.row.product-content-column-left");
+
+            if (detail != null) {
+                String urlRegex = "<link href=\"(.+)\" rel=\"canonical\">";
+                Pattern p = Pattern.compile(urlRegex);
+                Matcher m = p.matcher(response);
+                if (m.find()) {
+                    url = m.group(1);
+                }
+            }
 
             book = createBook(book.getISBN(), book.getAuthor(), book.getTitle());
             bookHandler.handleBook(book);
@@ -57,23 +71,26 @@ public class Numero7Request extends AbstractRequest {
     private final Response.ErrorListener failedRequestListener = new Response.ErrorListener() {
         @Override
         public void onErrorResponse(VolleyError error) {
-            errorListener.onErrorResponse(error);
+            Constants.errorListener.onErrorResponse(error);
             if (errorHandler != null) {
                 errorHandler.handleError(error);
             }
         }
     };
 
-    // TODO
     @Override
     protected Long getBookOldPrice() {
 
-        /*
-         * if (detail == null) { return -2L; }
-         *
-         * Element price = detail.selectFirst("span[itemprop=price]"); return price == null ? -1L : extractNumbers(price.html());
-         */
-        return -1L;
+        if (detail == null) {
+            return -2L;
+        }
+
+        if (detail.selectFirst("a.notify-request") != null) { // Available or not
+            return -1L;
+        }
+
+        Element price = detail.selectFirst("span.price.price_original_color.product_table_original");
+        return price == null ? -1L : extractNumbers(price.html());
     }
 
     @Override
@@ -83,7 +100,11 @@ public class Numero7Request extends AbstractRequest {
             return -2L;
         }
 
-        Element price = detail.selectFirst("span[itemprop=price]");
+        if (detail.selectFirst("a.notify-request") != null) { // Available or not
+            return -1L;
+        }
+
+        Element price = detail.selectFirst("span.price.price_special_color.product_table_special");
         return price == null ? -1L : extractNumbers(price.html());
     }
 
@@ -94,24 +115,22 @@ public class Numero7Request extends AbstractRequest {
             return -2L;
         }
 
-        Element perc = detail.selectFirst("span.label.label-primary");
+        if (detail.selectFirst("a.notify-request") != null) { // Available or not
+            return -1L;
+        }
+
+        Element perc = detail.selectFirst("span.decrease_amount");
         return perc == null ? -1L : extractNumbers(perc.html());
     }
 
     @Override
     protected String getUrl() {
-        if (detail != null) {
-            Element url = detail.selectFirst("a[itemprop=url]");
-            if (url != null) {
-                String base = "https://www.numero7.com";
-                return base + url.attr("href");
-            }
-        }
-        return null;
+        return detail == null ? null : url;
     }
 
     @Override
     protected String getName() {
-        return "numero7";
+        return "maikonyv";
     }
+
 }

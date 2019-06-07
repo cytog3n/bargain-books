@@ -3,6 +3,7 @@ package com.cyto.bargainbooks.request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.cyto.bargainbooks.config.Constants;
 import com.cyto.bargainbooks.model.Book;
 import com.cyto.bargainbooks.request.handler.BookHandler;
 import com.cyto.bargainbooks.request.handler.ErrorHandler;
@@ -16,17 +17,17 @@ import org.jsoup.nodes.Element;
 import java.util.HashMap;
 import java.util.Map;
 
-public class TTKOnlineRequest extends AbstractRequest {
+public class KonyvudvarBookRequest extends AbstractBookRequest {
 
     private Element detail;
-
-    private Book book;
 
     private final BookHandler bookHandler;
 
     private final ErrorHandler errorHandler;
 
-    public TTKOnlineRequest(@NotNull Book book, @NotNull BookHandler bh, ErrorHandler eh) {
+    private Book book;
+
+    public KonyvudvarBookRequest(@NotNull Book book, @NotNull BookHandler bh, ErrorHandler eh) {
         this.book = book;
         this.bookHandler = bh;
         this.errorHandler = eh;
@@ -37,7 +38,7 @@ public class TTKOnlineRequest extends AbstractRequest {
 
         Map<String, String> params = new HashMap<>();
         params.put("isbn", book.getISBN());
-        String search = "https://www.tkkonline.hu/index.php?category_id=0&search=${isbn}+&submit_search=&sub_category=1&route=product%2Fsearch&description=true";
+        String search = "https://konyvudvar.net/index.php?route=product/search&search=${isbn}";
         String url = UrlUtil.ApplyParameters(search, params);
 
         return new StringRequest(url, listener, failedRequestListener);
@@ -47,7 +48,7 @@ public class TTKOnlineRequest extends AbstractRequest {
         @Override
         public void onResponse(String response) {
             Document doc = Jsoup.parse(response);
-            detail = doc.selectFirst("div#products");
+            detail = doc.selectFirst("div.main-products.product-list");
 
             book = createBook(book.getISBN(), book.getAuthor(), book.getTitle());
             bookHandler.handleBook(book);
@@ -57,7 +58,7 @@ public class TTKOnlineRequest extends AbstractRequest {
     private final Response.ErrorListener failedRequestListener = new Response.ErrorListener() {
         @Override
         public void onErrorResponse(VolleyError error) {
-            errorListener.onErrorResponse(error);
+            Constants.errorListener.onErrorResponse(error);
             if (errorHandler != null) {
                 errorHandler.handleError(error);
             }
@@ -71,7 +72,7 @@ public class TTKOnlineRequest extends AbstractRequest {
             return -2L;
         }
 
-        Element price = detail.selectFirst("span.price-old");
+        Element price = detail.selectFirst("span.eredeti-ar-7");
         return price == null ? -1L : extractNumbers(price.html());
     }
 
@@ -93,14 +94,14 @@ public class TTKOnlineRequest extends AbstractRequest {
             return -2L;
         }
 
-        long percent = Math.round((this.getBookNewPrice().doubleValue() / this.getBookOldPrice().doubleValue()) * 100);
-        return 100 - percent;
+        Element perc = detail.selectFirst("span.label-sale2");
+        return perc == null ? -1L : extractNumbers(perc.html());
     }
 
     @Override
     protected String getUrl() {
         if (detail != null) {
-            Element url = detail.selectFirst("a.img");
+            Element url = detail.selectFirst("a");
             if (url != null) {
                 return url.attr("href");
             }
@@ -110,7 +111,7 @@ public class TTKOnlineRequest extends AbstractRequest {
 
     @Override
     protected String getName() {
-        return "ttkonline";
+        return "konyvudvar";
     }
 
 }

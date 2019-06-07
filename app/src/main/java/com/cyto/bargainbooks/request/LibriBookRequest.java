@@ -1,10 +1,9 @@
 package com.cyto.bargainbooks.request;
 
-import android.util.Log;
-
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.cyto.bargainbooks.config.Constants;
 import com.cyto.bargainbooks.model.Book;
 import com.cyto.bargainbooks.request.handler.BookHandler;
 import com.cyto.bargainbooks.request.handler.ErrorHandler;
@@ -14,14 +13,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-public class SzalayKonyvekRequest extends  AbstractRequest {
+public class LibriBookRequest extends AbstractBookRequest {
 
     private Element detail;
 
@@ -31,7 +27,7 @@ public class SzalayKonyvekRequest extends  AbstractRequest {
 
     private Book book;
 
-    public SzalayKonyvekRequest(@NotNull Book book, @NotNull BookHandler bh, ErrorHandler eh) {
+    public LibriBookRequest(@NotNull Book book, @NotNull BookHandler bh, ErrorHandler eh) {
         this.book = book;
         this.bookHandler = bh;
         this.errorHandler = eh;
@@ -42,7 +38,7 @@ public class SzalayKonyvekRequest extends  AbstractRequest {
 
         Map<String, String> params = new HashMap<>();
         params.put("isbn", book.getISBN());
-        String search = "https://www.szalaykonyvek.hu/shop_search.php?search=${isbn}";
+        String search = "https://www.libri.hu/talalati_lista/?reszletes=0&s_det=1&szerzo=&cim=&keyword=&s_cim=&book_target_id=&book_era_id=&book_location_id=&book_lang_id=&kiado=&isbn=${isbn}&ar1=&ar2=&ev1=&ev2=&ext_id=&transport_id=";
         String url = UrlUtil.ApplyParameters(search, params);
 
         return new StringRequest(url, listener, failedRequestListener);
@@ -52,22 +48,7 @@ public class SzalayKonyvekRequest extends  AbstractRequest {
         @Override
         public void onResponse(String response) {
             Document doc = Jsoup.parse(response);
-            Elements list = doc.select("form[name=form_temp_artdet]");
-            if (list.size() == 0) {
-                detail = null;
-            } else {
-                detail = list.first();
-            }
-
-            if (detail != null) {
-                String urlRegex = "<link href=\"(.+)\" rel=\"canonical\" \\/>";
-                Pattern p = Pattern.compile(urlRegex);
-                Matcher m = p.matcher(response);
-                if (m.find()) {
-                    String url = m.group(1);
-                    Log.d("url", m.group(1));
-                }
-            }
+            detail = doc.selectFirst("article.box-product-full");
 
             book = createBook(book.getISBN(), book.getAuthor(), book.getTitle());
             bookHandler.handleBook(book);
@@ -77,7 +58,7 @@ public class SzalayKonyvekRequest extends  AbstractRequest {
     private final Response.ErrorListener failedRequestListener = new Response.ErrorListener() {
         @Override
         public void onErrorResponse(VolleyError error) {
-            errorListener.onErrorResponse(error);
+            Constants.errorListener.onErrorResponse(error);
             if (errorHandler != null) {
                 errorHandler.handleError(error);
             }
@@ -91,7 +72,7 @@ public class SzalayKonyvekRequest extends  AbstractRequest {
             return -2L;
         }
 
-        Element price = detail.selectFirst("span[id^=price_net_brutto]");
+        Element price = detail.selectFirst("del");
         return price == null ? -1L : extractNumbers(price.html());
     }
 
@@ -102,7 +83,10 @@ public class SzalayKonyvekRequest extends  AbstractRequest {
             return -2L;
         }
 
-        Element price = detail.selectFirst("span[id^=price_akcio_brutto]");
+        Element price = detail.selectFirst("span.act-price");
+        if (getBookOldPrice() == -1) {
+            return -1L;
+        }
         return price == null ? -1L : extractNumbers(price.html());
     }
 
@@ -113,22 +97,24 @@ public class SzalayKonyvekRequest extends  AbstractRequest {
             return -2L;
         }
 
-        if (this.getBookNewPrice() > 0) {
-            long percent = Math.round((this.getBookNewPrice().doubleValue() / this.getBookOldPrice().doubleValue()) * 100);
-            return 100 - percent;
-        } else {
-            return 0L;
-        }
-
+        Element perc = detail.selectFirst("span.list-percent");
+        return perc == null ? -1L : extractNumbers(perc.html());
     }
 
     @Override
     protected String getUrl() {
-        return detail == null ? null : detail.baseUri();
+        if (detail != null) {
+            Element url = detail.selectFirst("a");
+            if (url != null) {
+                String base = "https://www.libri.hu";
+                return base + url.attr("href");
+            }
+        }
+        return null;
     }
 
     @Override
     protected String getName() {
-        return "szalay";
+        return "libri";
     }
 }

@@ -3,6 +3,7 @@ package com.cyto.bargainbooks.request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.cyto.bargainbooks.config.Constants;
 import com.cyto.bargainbooks.model.Book;
 import com.cyto.bargainbooks.request.handler.BookHandler;
 import com.cyto.bargainbooks.request.handler.ErrorHandler;
@@ -15,8 +16,10 @@ import org.jsoup.nodes.Element;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-public class LibriRequest extends AbstractRequest {
+public class ScolarBookRequest extends AbstractBookRequest {
 
     private Element detail;
 
@@ -26,7 +29,7 @@ public class LibriRequest extends AbstractRequest {
 
     private Book book;
 
-    public LibriRequest(@NotNull Book book, @NotNull BookHandler bh, ErrorHandler eh) {
+    public ScolarBookRequest(@NotNull Book book, @NotNull BookHandler bh, ErrorHandler eh) {
         this.book = book;
         this.bookHandler = bh;
         this.errorHandler = eh;
@@ -37,7 +40,7 @@ public class LibriRequest extends AbstractRequest {
 
         Map<String, String> params = new HashMap<>();
         params.put("isbn", book.getISBN());
-        String search = "https://www.libri.hu/talalati_lista/?reszletes=0&s_det=1&szerzo=&cim=&keyword=&s_cim=&book_target_id=&book_era_id=&book_location_id=&book_lang_id=&kiado=&isbn=${isbn}&ar1=&ar2=&ev1=&ev2=&ext_id=&transport_id=";
+        String search = "https://www.scolar.hu/index.php?route=product/list&keyword=${isbn}";
         String url = UrlUtil.ApplyParameters(search, params);
 
         return new StringRequest(url, listener, failedRequestListener);
@@ -47,7 +50,16 @@ public class LibriRequest extends AbstractRequest {
         @Override
         public void onResponse(String response) {
             Document doc = Jsoup.parse(response);
-            detail = doc.selectFirst("article.box-product-full");
+            detail = doc.selectFirst("div.product-page-price");
+
+            if (detail != null) {
+                String urlRegex = "<link href=\"(.+)\" rel=\"canonical\">";
+                Pattern p = Pattern.compile(urlRegex);
+                Matcher m = p.matcher(response);
+                if (m.find()) {
+                    String url = m.group(1);
+                }
+            }
 
             book = createBook(book.getISBN(), book.getAuthor(), book.getTitle());
             bookHandler.handleBook(book);
@@ -57,7 +69,7 @@ public class LibriRequest extends AbstractRequest {
     private final Response.ErrorListener failedRequestListener = new Response.ErrorListener() {
         @Override
         public void onErrorResponse(VolleyError error) {
-            errorListener.onErrorResponse(error);
+            Constants.errorListener.onErrorResponse(error);
             if (errorHandler != null) {
                 errorHandler.handleError(error);
             }
@@ -71,7 +83,7 @@ public class LibriRequest extends AbstractRequest {
             return -2L;
         }
 
-        Element price = detail.selectFirst("del");
+        Element price = detail.selectFirst("span.price.price_original_color.product_table_original");
         return price == null ? -1L : extractNumbers(price.html());
     }
 
@@ -82,10 +94,7 @@ public class LibriRequest extends AbstractRequest {
             return -2L;
         }
 
-        Element price = detail.selectFirst("span.act-price");
-        if (getBookOldPrice() == -1) {
-            return -1L;
-        }
+        Element price = detail.selectFirst("span.price.price_special_color.product_table_special");
         return price == null ? -1L : extractNumbers(price.html());
     }
 
@@ -96,24 +105,18 @@ public class LibriRequest extends AbstractRequest {
             return -2L;
         }
 
-        Element perc = detail.selectFirst("span.list-percent");
+        Element perc = detail.selectFirst("span.decrease_amount");
         return perc == null ? -1L : extractNumbers(perc.html());
     }
 
     @Override
     protected String getUrl() {
-        if (detail != null) {
-            Element url = detail.selectFirst("a");
-            if (url != null) {
-                String base = "https://www.libri.hu";
-                return base + url.attr("href");
-            }
-        }
-        return null;
+        return detail == null ? null : detail.baseUri();
     }
 
     @Override
     protected String getName() {
-        return "libri";
+        return "scolar";
     }
+
 }

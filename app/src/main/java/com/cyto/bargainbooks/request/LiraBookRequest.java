@@ -3,6 +3,7 @@ package com.cyto.bargainbooks.request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.cyto.bargainbooks.config.Constants;
 import com.cyto.bargainbooks.model.Book;
 import com.cyto.bargainbooks.request.handler.BookHandler;
 import com.cyto.bargainbooks.request.handler.ErrorHandler;
@@ -12,14 +13,15 @@ import org.jetbrains.annotations.NotNull;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Szazad21Request extends AbstractRequest {
+public class LiraBookRequest extends AbstractBookRequest {
+
+    private String url;
 
     private Element detail;
 
@@ -29,9 +31,7 @@ public class Szazad21Request extends AbstractRequest {
 
     private Book book;
 
-    private String url = null;
-
-    public Szazad21Request(@NotNull Book book, @NotNull BookHandler bh, ErrorHandler eh) {
+    public LiraBookRequest(@NotNull Book book, @NotNull BookHandler bh, ErrorHandler eh) {
         this.book = book;
         this.bookHandler = bh;
         this.errorHandler = eh;
@@ -42,7 +42,7 @@ public class Szazad21Request extends AbstractRequest {
 
         Map<String, String> params = new HashMap<>();
         params.put("isbn", book.getISBN());
-        String search = "https://21.szazadkiado.hu/index.php?route=product/list&keyword=${isbn}";
+        String search = "https://www.lira.hu/hu/reszletes_kereso?listtype=1&listorder=release_date&listdirection=desc&listpagenumber=20&listcurrentpage=0&detaled_search_category=001&detaled_search_title=&detaled_search_isbn=${isbn}&detaled_search_year=&detaled_search_price1=&detaled_search_price2=&detaled_search_author=&detaled_search_publisher=&detaled_search_description=&detaled_search_series=&detaled_search_labels=";
         String url = UrlUtil.ApplyParameters(search, params);
 
         return new StringRequest(url, listener, failedRequestListener);
@@ -52,16 +52,10 @@ public class Szazad21Request extends AbstractRequest {
         @Override
         public void onResponse(String response) {
             Document doc = Jsoup.parse(response);
-            Elements list = doc.select("table.product_table");
-
-            if (list.size() == 0) {
-                detail = null;
-            } else {
-                detail = list.first();
-            }
+            detail = doc.selectFirst("div.detail_item");
 
             if (detail != null) {
-                String urlRegex = "<link href=\"(.+)\" rel=\"canonical\">";
+                String urlRegex = "<link rel=\"canonical\" href=\"(.+)\" \\/>";
                 Pattern p = Pattern.compile(urlRegex);
                 Matcher m = p.matcher(response);
                 if (m.find()) {
@@ -77,7 +71,7 @@ public class Szazad21Request extends AbstractRequest {
     private final Response.ErrorListener failedRequestListener = new Response.ErrorListener() {
         @Override
         public void onErrorResponse(VolleyError error) {
-            errorListener.onErrorResponse(error);
+            Constants.errorListener.onErrorResponse(error);
             if (errorHandler != null) {
                 errorHandler.handleError(error);
             }
@@ -91,7 +85,7 @@ public class Szazad21Request extends AbstractRequest {
             return -2L;
         }
 
-        Element price = detail.selectFirst("span.price.price_original_color.product_table_original");
+        Element price = detail.selectFirst("div.price.text-left");
         return price == null ? -1L : extractNumbers(price.html());
     }
 
@@ -102,7 +96,7 @@ public class Szazad21Request extends AbstractRequest {
             return -2L;
         }
 
-        Element price = detail.selectFirst("span.price.price_special_color.product_table_special");
+        Element price = detail.selectFirst("div.discounted_price.text-left");
         return price == null ? -1L : extractNumbers(price.html());
     }
 
@@ -113,8 +107,7 @@ public class Szazad21Request extends AbstractRequest {
             return -2L;
         }
 
-        Elements list = detail.select("span.decrease_amount");
-        Element perc = list.get(1);
+        Element perc = detail.selectFirst("div.percent.text-left");
         return perc == null ? -1L : extractNumbers(perc.html());
     }
 
@@ -125,7 +118,7 @@ public class Szazad21Request extends AbstractRequest {
 
     @Override
     protected String getName() {
-        return "szazad21";
+        return "lira";
     }
 
 }

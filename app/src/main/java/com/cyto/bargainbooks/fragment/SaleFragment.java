@@ -19,7 +19,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ExpandableListView;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
@@ -27,7 +26,7 @@ import com.cyto.bargainbooks.R;
 import com.cyto.bargainbooks.adapter.ExpandableBookListAdapter;
 import com.cyto.bargainbooks.adapter.ExpandableStoreListAdapter;
 import com.cyto.bargainbooks.config.Constants;
-import com.cyto.bargainbooks.factory.RequestFactory;
+import com.cyto.bargainbooks.factory.BookRequestFactory;
 import com.cyto.bargainbooks.model.Book;
 import com.cyto.bargainbooks.request.handler.BookHandler;
 import com.cyto.bargainbooks.request.handler.ErrorHandler;
@@ -71,7 +70,7 @@ public class SaleFragment extends Fragment {
 
     private List<Book> responseBooks = new ArrayList<>();
 
-    private RequestFactory requestFactory;
+    private BookRequestFactory bookRequestFactory;
 
     private Boolean sort = true; // true -> %; false -> alphabetically
 
@@ -129,7 +128,7 @@ public class SaleFragment extends Fragment {
             responseBooks.clear();
             VolleyService vs = VolleyService.getInstance(getContext());
             for (Book b : BookWishlist.getBooks()) {
-                List<StringRequest> reqs = requestFactory.getRequests(b, bh, eh);
+                List<StringRequest> reqs = bookRequestFactory.getRequests(b, bh, eh);
                 reqCount += reqs.size();
                 for (StringRequest req : reqs) {
                     vs.addToRequestQueue(req.setRetryPolicy(Constants.requestPolicy));
@@ -173,7 +172,7 @@ public class SaleFragment extends Fragment {
         ((NavigationView) getActivity().findViewById(R.id.nav_view)).setCheckedItem(R.id.nav_sale);
         expandableListView = view.findViewById(R.id.expandableListView);
         progressBar = view.findViewById(R.id.progressBar);
-        requestFactory = new RequestFactory(getContext());
+        bookRequestFactory = new BookRequestFactory(getContext());
 
         if (saleLevel.equals("BOOK_LEVEL")) {
             bookLevelList(view);

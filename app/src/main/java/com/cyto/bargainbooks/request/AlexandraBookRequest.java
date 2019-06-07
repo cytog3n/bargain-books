@@ -3,6 +3,7 @@ package com.cyto.bargainbooks.request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.cyto.bargainbooks.config.Constants;
 import com.cyto.bargainbooks.model.Book;
 import com.cyto.bargainbooks.request.handler.BookHandler;
 import com.cyto.bargainbooks.request.handler.ErrorHandler;
@@ -16,7 +17,7 @@ import org.jsoup.nodes.Element;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MolyBoltRequest extends AbstractRequest {
+public class AlexandraBookRequest extends AbstractBookRequest {
 
     private Element detail;
 
@@ -26,7 +27,7 @@ public class MolyBoltRequest extends AbstractRequest {
 
     private Book book;
 
-    public MolyBoltRequest(@NotNull Book book, @NotNull BookHandler bh, ErrorHandler eh) {
+    public AlexandraBookRequest(@NotNull Book book, @NotNull BookHandler bh, ErrorHandler eh) {
         this.book = book;
         this.bookHandler = bh;
         this.errorHandler = eh;
@@ -36,8 +37,8 @@ public class MolyBoltRequest extends AbstractRequest {
     public StringRequest getStringRequest() {
 
         Map<String, String> params = new HashMap<>();
-        params.put("isbn", book.getISBN());
-        String search = "https://www.molybolt.hu/index.php?BODY=Search&OP=ISBNSearch&isbn=${isbn}";
+        params.put("isbn", book.getISBN().substring(3));
+        String search = "https://alexandra.hu/reszletes-kereses-eredmeny?isbn=${isbn}";
         String url = UrlUtil.ApplyParameters(search, params);
 
         return new StringRequest(url, listener, failedRequestListener);
@@ -47,7 +48,8 @@ public class MolyBoltRequest extends AbstractRequest {
         @Override
         public void onResponse(String response) {
             Document doc = Jsoup.parse(response);
-            detail = doc.selectFirst("table#products");
+            detail = doc.selectFirst("div.rb-home_mainpage-work-main");
+            detail = detail.selectFirst("div.rb2-slider-item.rb2-slider-item-1");
 
             book = createBook(book.getISBN(), book.getAuthor(), book.getTitle());
             bookHandler.handleBook(book);
@@ -57,12 +59,13 @@ public class MolyBoltRequest extends AbstractRequest {
     private final Response.ErrorListener failedRequestListener = new Response.ErrorListener() {
         @Override
         public void onErrorResponse(VolleyError error) {
-            errorListener.onErrorResponse(error);
+            Constants.errorListener.onErrorResponse(error);
             if (errorHandler != null) {
                 errorHandler.handleError(error);
             }
         }
     };
+
 
     @Override
     protected Long getBookOldPrice() {
@@ -71,7 +74,7 @@ public class MolyBoltRequest extends AbstractRequest {
             return -2L;
         }
 
-        Element price = detail.selectFirst("td.boltiartd nobr");
+        Element price = detail.selectFirst("div.alexdata_footer_price");
         return price == null ? -1L : extractNumbers(price.html());
     }
 
@@ -82,7 +85,7 @@ public class MolyBoltRequest extends AbstractRequest {
             return -2L;
         }
 
-        Element price = detail.selectFirst("td.internetesartd nobr");
+        Element price = detail.selectFirst("div.alexdata_footer_onlineprice");
         return price == null ? -1L : extractNumbers(price.html());
     }
 
@@ -93,16 +96,16 @@ public class MolyBoltRequest extends AbstractRequest {
             return -2L;
         }
 
-        long percent = Math.round((this.getBookNewPrice().doubleValue() / this.getBookOldPrice().doubleValue()) * 100);
-        return 100 - percent;
+        Element perc = detail.selectFirst("div.alexdata_footer_discontpercent");
+        return perc == null ? -1L : extractNumbers(perc.html());
     }
 
     @Override
     protected String getUrl() {
         if (detail != null) {
-            Element url = detail.selectFirst("td a");
+            Element url = detail.selectFirst("a");
             if (url != null) {
-                String base = "https://www.molybolt.hu/";
+                String base = "https://alexandra.hu";
                 return base + url.attr("href");
             }
         }
@@ -111,7 +114,6 @@ public class MolyBoltRequest extends AbstractRequest {
 
     @Override
     protected String getName() {
-        return "molybolt";
+        return "alexandra";
     }
-
 }

@@ -49,7 +49,9 @@ public class AlexandraBookRequest extends AbstractBookRequest {
         public void onResponse(String response) {
             Document doc = Jsoup.parse(response);
             detail = doc.selectFirst("div.rb-home_mainpage-work-main");
-            detail = detail.selectFirst("div.rb2-slider-item.rb2-slider-item-1");
+            if (detail != null) {
+                detail = detail.selectFirst("div.rb2-slider-item.rb2-slider-item-1");
+            }
 
             book = createBook(book.getISBN(), book.getAuthor(), book.getTitle());
             bookHandler.handleBook(book);

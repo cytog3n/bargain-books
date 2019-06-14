@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -19,18 +20,24 @@ import com.android.volley.VolleyError;
 import com.cyto.bargainbooks.R;
 import com.cyto.bargainbooks.model.Book;
 import com.cyto.bargainbooks.parser.LibriWishlistParser;
+import com.cyto.bargainbooks.parser.MolyWishlistParser;
 import com.cyto.bargainbooks.request.handler.BookHandler;
 import com.cyto.bargainbooks.request.handler.ErrorHandler;
 import com.cyto.bargainbooks.request.handler.ListRequestHandler;
 import com.cyto.bargainbooks.storage.BookWishlist;
 
+import org.apache.commons.collections4.map.HashedMap;
+
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
-public class ImportLibriWishlistFragment extends Fragment {
+public class ImportOnlineWishlistFragment extends Fragment {
 
-    private ImportLibriWishlistFragment.OnFragmentInteractionListener mListener;
+    private ImportOnlineWishlistFragment.OnFragmentInteractionListener mListener;
 
     private View view;
 
@@ -44,7 +51,7 @@ public class ImportLibriWishlistFragment extends Fragment {
 
     private ProgressBar progressBar;
 
-    private List<Book> resultBooks = new ArrayList<>();
+    private Map<Book, Boolean> resultBooks = new HashedMap<>();
 
     private Integer req = 0;
 
@@ -52,7 +59,7 @@ public class ImportLibriWishlistFragment extends Fragment {
 
     private Date startDate;
 
-    public ImportLibriWishlistFragment() {
+    public ImportOnlineWishlistFragment() {
         // Required empty public constructor
     }
 
@@ -60,10 +67,10 @@ public class ImportLibriWishlistFragment extends Fragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @return A new instance of fragment ImportLibriWishlistFragment.
+     * @return A new instance of fragment ImportOnlineWishlistFragment.
      */
-    public static ImportLibriWishlistFragment newInstance() {
-        ImportLibriWishlistFragment fragment = new ImportLibriWishlistFragment();
+    public static ImportOnlineWishlistFragment newInstance() {
+        ImportOnlineWishlistFragment fragment = new ImportOnlineWishlistFragment();
         Bundle args = new Bundle();
         fragment.setArguments(args);
         return fragment;
@@ -72,12 +79,12 @@ public class ImportLibriWishlistFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.i("ImportLibriWishlistFragment", "Created");
+        Log.i("ImportOnlineWishlistFragment", "Created");
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.fragment_import_libri_wishlist, container, false);
+        view = inflater.inflate(R.layout.fragment_import_online_wishlist, container, false);
         queryButton = view.findViewById(R.id.queryButton);
         importButton = view.findViewById(R.id.importButton);
         urlEditText = view.findViewById(R.id.urlEditText);
@@ -86,23 +93,62 @@ public class ImportLibriWishlistFragment extends Fragment {
 
         queryButton.setOnClickListener(v -> {
             if (urlEditText.getText() != null) {
-                startDate = new Date();
-                resultBooks.clear();
-                req = 0;
-                res = 0;
-                new LibriWishlistParser(getContext(), listRequestHandler, bh, eh).start(urlEditText.getText().toString());
+
+                try {
+                    URI uri = URI.create(urlEditText.getText().toString());
+                    String host = uri.getHost();
+
+                    if (host == null) {
+                        Snackbar.make(view, getContext().getString(R.string.wrong_url_error), Snackbar.LENGTH_LONG).setAction("Action", null).show();
+                    } else {
+                        if (host.contains("moly")) {
+                            startQuery("moly");
+                        } else if (host.contains("libri")) {
+                            startQuery("libri");
+                        } else {
+                            Snackbar.make(view, getContext().getString(R.string.wrong_url_error), Snackbar.LENGTH_LONG).setAction("Action", null).show();
+                        }
+                    }
+                } catch (IllegalArgumentException e) {
+                    Snackbar.make(view, getContext().getString(R.string.invalid_url_error), Snackbar.LENGTH_LONG).setAction("Action", null).show();
+                }
             } else {
-                Snackbar.make(view, getContext().getString(R.string.empty_url_error), Snackbar.LENGTH_LONG).setAction("Action", null).show();
+                Snackbar.make(view, getContext().getString(R.string.invalid_url_error), Snackbar.LENGTH_LONG).setAction("Action", null).show();
             }
         });
 
         importButton.setOnClickListener(v -> {
-            BookWishlist.saveBooks(resultBooks);
+
+            List<Book> books = new ArrayList<>();
+            for (Map.Entry<Book, Boolean> entry : resultBooks.entrySet()) {
+                if (entry.getValue()) books.add(entry.getKey());
+            }
+
+            BookWishlist.saveBooks(books);
             BookWishlist.saveListToSharedPreferences(getContext());
             Snackbar.make(view, getContext().getString(R.string.import_finished), Snackbar.LENGTH_LONG).setAction("Action", null).show();
         });
 
         return view;
+    }
+
+    private void startQuery(String webpage) {
+
+        startDate = new Date();
+        resultBooks.clear();
+        req = 0;
+        res = 0;
+
+        switch (webpage) {
+            case "libri":
+                new LibriWishlistParser(getContext(), listRequestHandler, bh, eh).start(urlEditText.getText().toString());
+                break;
+            case "moly":
+                new MolyWishlistParser(getContext(), listRequestHandler, bh, eh).start(urlEditText.getText().toString());
+                break;
+        }
+
+
     }
 
     public void onButtonPressed(Uri uri) {
@@ -114,9 +160,9 @@ public class ImportLibriWishlistFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        Log.i("ImportLibriWishlistFragment", "Attached");
-        if (context instanceof ImportLibriWishlistFragment.OnFragmentInteractionListener) {
-            mListener = (ImportLibriWishlistFragment.OnFragmentInteractionListener) context;
+        Log.i("ImportOnlineWishlistFragment", "Attached");
+        if (context instanceof ImportOnlineWishlistFragment.OnFragmentInteractionListener) {
+            mListener = (ImportOnlineWishlistFragment.OnFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnFragmentInteractionListener");
@@ -126,7 +172,7 @@ public class ImportLibriWishlistFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        Log.i("ImportLibriWishlistFragment", "Detached");
+        Log.i("ImportOnlineWishlistFragment", "Detached");
         mListener = null;
     }
 
@@ -150,9 +196,9 @@ public class ImportLibriWishlistFragment extends Fragment {
             res++;
             progressBar.setProgress(res);
             if (b != null) {
-                resultBooks.add(b);
+                resultBooks.put(b, true);
             }
-            Log.d("ImportLibriWishlistFragment", "Requests: " + res + "/" + req);
+            Log.d("ImportOnlineWishlistFragment", "Requests: " + res + "/" + req);
             if (res.equals(req)) {
                 onAllRequestComplete();
             }
@@ -179,7 +225,7 @@ public class ImportLibriWishlistFragment extends Fragment {
                 progressBar.setVisibility(View.VISIBLE);
                 Snackbar.make(view, String.format(getContext().getString(R.string.importing_x_books), bookCount), Snackbar.LENGTH_LONG).setAction("Action", null).show();
             } else {
-                Snackbar.make(view, getContext().getString(R.string.empty_url_error), Snackbar.LENGTH_LONG).setAction("Action", null).show();
+                Snackbar.make(view, getContext().getString(R.string.empty_wishlist_error), Snackbar.LENGTH_LONG).setAction("Action", null).show();
             }
 
         }
@@ -203,10 +249,28 @@ public class ImportLibriWishlistFragment extends Fragment {
 
     private void populateResultBooksLayout() {
         resultBooksLinearLayout.removeAllViews();
-        for (Book b : resultBooks) {
+
+        for (Map.Entry<Book, Boolean> entry : resultBooks.entrySet()) {
+            Book b = entry.getKey();
             View view = getLayoutInflater().inflate(R.layout.book_import_item, resultBooksLinearLayout, false);
             ((TextView) view.findViewById(R.id.title)).setText(b.getTitle());
             ((TextView) view.findViewById(R.id.author)).setText(b.getAuthor());
+            CheckBox cb = view.findViewById(R.id.checkBox);
+            cb.setChecked(true);
+
+            view.setOnClickListener(v -> {
+                cb.setChecked(!cb.isChecked());
+            });
+
+            cb.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                /* String isbn = buttonView.getHint().toString();
+                Optional<Book> optBook = resultBooks.keySet().stream().filter(book -> book.getISBN().equals(isbn)).findFirst();
+                if (optBook.isPresent()) {
+                    resultBooks.replace(optBook.get(), isChecked);
+                }*/
+                resultBooks.replace(b, isChecked);
+            });
+
             resultBooksLinearLayout.addView(view);
         }
 

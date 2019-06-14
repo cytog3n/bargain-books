@@ -5,8 +5,8 @@
     <string name="wishlist">Wishlist</string>
     <string name="search">Search</string>
     <string name="sale">Sale</string>
-    <string name="import_">Import</string>
-    <string name="send">Send</string>
+    <string name="import_">Import MyLibrary</string>
+    <string name="send">Import</string>
     <string name="browse">Browse</string>
     <string name="browse_placeholder">No files selected &#8230;</string>
     <string name="nav_header_desc">Navigation header</string>
@@ -34,7 +34,6 @@
     <string name="isbn_placeholder">9789639910256</string>
     <string name="lastUpdated">Last updated</string>
     <string name="isbn_label">ISBN</string>
-
     <string name="empty_string"></string>
     <string name="sale_percent">%d%%</string>
     <string name="sale_percent_parenthesis">(%d%%)</string>
@@ -42,13 +41,29 @@
     <string name="query_finished_sec">Finished in %d seconds</string>
     <string name="sorted_alphabet">Sorted alphabetically</string>
     <string name="sorted_discount">Sorted by discount</string>
-    <string name="title_libri_import">Import books from (Libri) public wishlist</string>
+    <string name="title_online_import">Import books from online wishlist</string>
     <string name="Import">Import </string>
     <string name="query">Query</string>
     <string name="libriImportError">Looks empty. :(</string>
     <string name="importing_x_books">Importing %d books</string>
     <string name="empty_url_error">Please give a valid URL for your public wishlist</string>
-    <string name="import_libri_wishlist">Import Libri wishlist</string>
+    <string name="import_libri_wishlist">Import Online wishlist</string>
     <string name="import_finished">Import finished</string>
-
+    <string name="online_wishlist_list">Currently working wishlists: \n\nLibri (https://www.libri.hu/kivansaglista/?c121e9cefab6e067489521)\nMoly (https://moly.hu/tagok/username/kivansaglista)</string>
+    <string name="libri">Libri</string>
+    <string name="libri_wishlist_ex">https://www.libri.hu/kivansaglista/?c121e9cefab6e067b93b6d6ed8489521</string>
+    <string name="moly">Moly</string>
+    <string name="moly_wishlist_ex">https://moly.hu/tagok/cytog3n/kivansaglista</string>
+    <string name="url">URL</string>
+    <string name="wrong_url_error">Looks like the provided URL not supported</string>
+    <string name="invalid_url_error">Please provide a valid URL</string>
+    <string name="empty_wishlist_error">Looks empty :(</string>
+    <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
+    <string name="book_removed_from_wishlist">Book removed from you wishlist.</string>
+    <string name="delete_confirm_title">Delete?</string>
+    <string name="delete_confirm_text">Are you sure you want to delete?</string>
+    <string name="no">No</string>
+    <string name="yes">Yes</string>
+    <string name="book_detail_updated">Book detail updated</string>
 </resources>

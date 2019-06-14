@@ -1,6 +1,8 @@
 package com.cyto.bargainbooks.fragment;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
@@ -20,6 +22,8 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.navigation.Navigation;
 
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
@@ -95,10 +99,9 @@ public class BookDetailFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        bookList.clear();
 
         if (id == R.id.action_refresh) {
-
+            bookList.clear();
             VolleyService vs = VolleyService.getInstance(getContext());
             startDate = new Date();
             BookRequestFactory rf = new BookRequestFactory(getContext());
@@ -109,6 +112,38 @@ public class BookDetailFragment extends Fragment {
             }
             reqCount += srs.size();
             progressBar.setMax(reqCount);
+
+        } else if (id == R.id.action_delete) {
+
+            new AlertDialog.Builder(getContext()).setTitle(getString(R.string.delete_confirm_title))
+                    .setMessage(getString(R.string.delete_confirm_text))
+                    .setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                            BookWishlist.getBooks().remove(book);
+                            BookWishlist.saveListToSharedPreferences(getContext());
+
+                            bookList.forEach(book1 -> {
+                                BookSaleList.getBooks().remove(book1);
+                            });
+                            BookSaleList.saveListToSharedPreferences(getContext());
+
+                            Navigation.findNavController(getActivity().findViewById(R.id.nav_host_fragment)).navigateUp();
+                            Snackbar.make(view, getContext().getText(R.string.book_removed_from_wishlist), Snackbar.LENGTH_LONG).setAction("Action", null).show();
+
+                        }
+                    })
+                    .setNegativeButton(getString(R.string.no), null)
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .show();
+
+        } else if (id == R.id.action_edit) {
+
+            Bundle bundle = new Bundle();
+            bundle.putString("isbn", book.getISBN());
+            Navigation.findNavController(getActivity().findViewById(R.id.nav_host_fragment)).navigate(R.id.BookDetailEditFragment, bundle);
+
         }
 
         return super.onOptionsItemSelected(item);
@@ -194,8 +229,7 @@ public class BookDetailFragment extends Fragment {
 
             view.setOnClickListener(v -> {
                 if (b.getUrl() == null) {
-                    Snackbar.make(view, getContext().getText(R.string.no_available_store), Snackbar.LENGTH_LONG)
-                            .setAction("Action", null).show();
+                    Snackbar.make(view, getContext().getText(R.string.no_available_store), Snackbar.LENGTH_LONG).setAction("Action", null).show();
                 } else {
                     Intent intent = new Intent(Intent.ACTION_VIEW);
                     intent.setData(Uri.parse(b.getUrl()));

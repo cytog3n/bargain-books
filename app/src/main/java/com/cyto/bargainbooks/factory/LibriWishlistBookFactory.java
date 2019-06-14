@@ -11,13 +11,11 @@ import java.util.regex.Pattern;
 
 public class LibriWishlistBookFactory {
 
-    private static Element element;
-
     public static Book createBook(String s) {
         Book b = new Book();
 
         Document doc = Jsoup.parse(s);
-        element = doc.selectFirst("span.product-title");
+        Element element = doc.selectFirst("span.product-title");
         if (element != null) {
             b.setTitle(element.html());
         } else {
@@ -32,7 +30,9 @@ public class LibriWishlistBookFactory {
         }
 
         // <meta itemprop="isbn" content="9789632638164">
-        String urlRegex = "<meta itemprop=\"isbn\" content=\"(.+)\">";
+        // String urlRegex = "<meta itemprop=\"isbn\" content=\"(.+)\">";
+        // <meta property="og:isbn" content="9786155555336" />
+        String urlRegex = "<meta property=\"og:isbn\" content=\"(\\d+)\" \\/>";
         Pattern p = Pattern.compile(urlRegex);
         Matcher m = p.matcher(s);
         if (m.find()) {

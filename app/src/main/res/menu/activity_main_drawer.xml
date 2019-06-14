@@ -20,12 +20,13 @@
             android:title="@string/import_" />
 
         <item
+            android:id="@+id/nav_import_libri_books"
+            android:title="@string/import_libri_wishlist" />
+
+        <item
             android:id="@+id/nav_config"
             android:title="@string/config" />
 
-        <item
-            android:id="@+id/nav_import_libri_books"
-            android:title="@string/import_libri_wishlist" />
     </group>
 
 </menu>

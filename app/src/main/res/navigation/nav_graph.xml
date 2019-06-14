@@ -41,9 +41,15 @@
         tools:layout="@layout/fragment_book_detail" />
 
     <fragment
-        android:id="@+id/ImportLibriWishListFragment"
-        android:name="com.cyto.bargainbooks.fragment.ImportLibriWishlistFragment"
-        android:label="import_libri_wishlist_fragment"
-        tools:layout="@layout/fragment_import_libri_wishlist" />
+        android:id="@+id/ImportOnlineWishListFragment"
+        android:name="com.cyto.bargainbooks.fragment.ImportOnlineWishlistFragment"
+        android:label="import_online_wishlist_fragment"
+        tools:layout="@layout/fragment_import_online_wishlist" />
+
+    <fragment
+        android:id="@+id/BookDetailEditFragment"
+        android:name="com.cyto.bargainbooks.fragment.BookDetailEditFragment"
+        android:label="book_detail_edit_fragment"
+        tools:layout="@layout/fragment_book_edit_detail" />
 
 </navigation>

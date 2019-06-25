@@ -1,6 +1,8 @@
 package com.cyto.bargainbooks.fragment;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
@@ -53,8 +55,6 @@ public class SaleFragment extends Fragment {
     private ExpandableListView expandableListView;
 
     private ProgressBar progressBar;
-
-    private View view;
 
     private ExpandableBookListAdapter expandableBookListAdapter;
 
@@ -119,9 +119,20 @@ public class SaleFragment extends Fragment {
         int id = item.getItemId();
 
         if (id == R.id.action_clear) {
-            BookSaleList.clear();
-            BookSaleList.saveListToSharedPreferences(getContext());
-            refreshFragment();
+
+            new AlertDialog.Builder(getContext()).setTitle(getString(R.string.clear_confirm_title))
+                    .setMessage(getString(R.string.clear_confirm_text))
+                    .setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                            BookSaleList.clear();
+                            BookSaleList.saveListToSharedPreferences(getContext());
+                            refreshFragment();
+                        }
+                    })
+                    .setNegativeButton(getString(R.string.no), null)
+                    .show();
             return true;
         } else if (id == R.id.action_refresh) {
             startDate = new Date();
@@ -131,31 +142,27 @@ public class SaleFragment extends Fragment {
                 List<StringRequest> reqs = bookRequestFactory.getRequests(b, bh, eh);
                 reqCount += reqs.size();
                 for (StringRequest req : reqs) {
-                    vs.addToRequestQueue(req.setRetryPolicy(Constants.requestPolicy));
+                    vs.addToRequestQueue(req.setRetryPolicy(Constants.requestPolicy).setTag(Constants.SALE_TAG));
                 }
             }
 
             progressBar.setMax(reqCount);
             progressBar.setVisibility(View.VISIBLE);
         } else if (id == R.id.action_change_book_view) {
-            if (saleLevel.equals(Constants.storeLevel)) {
-                saleLevel = Constants.bookLevel;
-                refreshFragment();
-            }
+            saleLevel = Constants.bookLevel;
+            refreshFragment();
         } else if (id == R.id.action_change_store_view) {
-            if (saleLevel.equals(Constants.bookLevel)) {
-                saleLevel = Constants.storeLevel;
-                refreshFragment();
-            }
+            saleLevel = Constants.storeLevel;
+            refreshFragment();
         } else if (id == R.id.sort) {
             if (saleLevel.equals(Constants.bookLevel)) {
                 if (!sort) {
                     expandableListTitle.sort(Comparator.comparing(pair -> 100 - ((Book) pair.second).getSalePercent()));
-                    Snackbar.make(view, R.string.sorted_discount, Snackbar.LENGTH_SHORT).setAction("Action", null).show();
+                    Snackbar.make(getActivity().getCurrentFocus(), R.string.sorted_discount, Snackbar.LENGTH_SHORT).setAction("Action", null).show();
                     sort = !sort;
                 } else {
                     expandableListTitle.sort(Comparator.comparing(pair -> ((Book) pair.second).getTitle()));
-                    Snackbar.make(view, R.string.sorted_alphabet, Snackbar.LENGTH_SHORT).setAction("Action", null).show();
+                    Snackbar.make(getActivity().getCurrentFocus(), R.string.sorted_alphabet, Snackbar.LENGTH_SHORT).setAction("Action", null).show();
                     sort = !sort;
                 }
                 expandableBookListAdapter.notifyDataSetChanged();
@@ -226,13 +233,16 @@ public class SaleFragment extends Fragment {
      * Refreshes the fragment, so the onCreateView method will initialize the whole fragment.
      */
     private void refreshFragment() {
-        FragmentTransaction ft = getFragmentManager().beginTransaction();
-        if (Build.VERSION.SDK_INT >= 26) {
-            ft.setReorderingAllowed(false);
+        if (getFragmentManager().getPrimaryNavigationFragment() == this || getFragmentManager().getPrimaryNavigationFragment() == null) {
+
+            FragmentTransaction ft = getFragmentManager().beginTransaction();
+            if (Build.VERSION.SDK_INT >= 26) {
+                ft.setReorderingAllowed(false);
+            }
+            expandableListTitle.clear();
+            expandableListDetail.clear();
+            ft.detach(this).attach(this).commit();
         }
-        expandableListTitle.clear();
-        expandableListDetail.clear();
-        ft.detach(this).attach(this).commit();
     }
 
     /**
@@ -242,7 +252,7 @@ public class SaleFragment extends Fragment {
         Date endDate = new Date();
         long diff = (endDate.getTime() - startDate.getTime()) / 1000;
         Log.d("Request time", diff / 1000 + " seconds");
-        Snackbar.make(view, String.format(getContext().getString(R.string.query_finished_sec), diff), Snackbar.LENGTH_LONG)
+        Snackbar.make(getActivity().getCurrentFocus(), String.format(getContext().getString(R.string.query_finished_sec), diff), Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show();
 
         if (responseBooks.size() > 0) {
@@ -250,7 +260,7 @@ public class SaleFragment extends Fragment {
             BookSaleList.saveListToSharedPreferences(getContext());
             BookWishlist.saveListToSharedPreferences(getContext()); //save the updateDate
         } else {
-            Snackbar.make(view, "Please check your network", Snackbar.LENGTH_LONG)
+            Snackbar.make(getActivity().getCurrentFocus(), "Please check your network", Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show();
         }
 
@@ -319,7 +329,7 @@ public class SaleFragment extends Fragment {
             Book b = expandableListDetail.get(expandableListTitle.get(groupPosition).first).get(childPosition);
 
             if (b.getUrl() == null) {
-                Snackbar.make(view, getContext().getText(R.string.no_available_store), Snackbar.LENGTH_LONG)
+                Snackbar.make(getActivity().getCurrentFocus(), getContext().getText(R.string.no_available_store), Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             } else {
                 Intent intent = new Intent(Intent.ACTION_VIEW);
@@ -358,7 +368,7 @@ public class SaleFragment extends Fragment {
             Book b = expandableListDetail.get(expandableListTitle.get(groupPosition).first).get(childPosition);
 
             if (b.getUrl() == null) {
-                Snackbar.make(view, getContext().getText(R.string.no_available_store), Snackbar.LENGTH_LONG)
+                Snackbar.make(getActivity().getCurrentFocus(), getContext().getText(R.string.no_available_store), Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             } else {
                 Intent intent = new Intent(Intent.ACTION_VIEW);

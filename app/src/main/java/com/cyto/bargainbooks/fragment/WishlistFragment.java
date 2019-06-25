@@ -1,6 +1,8 @@
 package com.cyto.bargainbooks.fragment;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -70,10 +72,22 @@ public class WishlistFragment extends Fragment {
         int id = item.getItemId();
 
         if (id == R.id.action_clear_wishlist) {
-            BookWishlist.clear();
-            BookWishlist.saveListToSharedPreferences(getContext());
-            listTitle.clear();
-            refreshFragment();
+
+            new AlertDialog.Builder(getContext()).setTitle(getString(R.string.clear_confirm_title))
+                    .setMessage(getString(R.string.clear_confirm_text))
+                    .setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                            BookWishlist.clear();
+                            BookWishlist.saveListToSharedPreferences(getContext());
+                            listTitle.clear();
+                            refreshFragment();
+                        }
+                    })
+                    .setNegativeButton(getString(R.string.no), null)
+                    .show();
+
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -155,11 +169,13 @@ public class WishlistFragment extends Fragment {
      * Refreshes the fragment, so the onCreateView method will initialize the whole fragment.
      */
     private void refreshFragment() {
-        FragmentTransaction ft = getFragmentManager().beginTransaction();
-        if (Build.VERSION.SDK_INT >= 26) {
-            ft.setReorderingAllowed(false);
+        if (getFragmentManager().getPrimaryNavigationFragment() == this) {
+            FragmentTransaction ft = getFragmentManager().beginTransaction();
+            if (Build.VERSION.SDK_INT >= 26) {
+                ft.setReorderingAllowed(false);
+            }
+            ft.detach(this).attach(this).commit();
         }
-        ft.detach(this).attach(this).commit();
     }
 
 }

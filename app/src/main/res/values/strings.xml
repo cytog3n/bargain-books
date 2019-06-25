@@ -66,4 +66,7 @@
     <string name="no">No</string>
     <string name="yes">Yes</string>
     <string name="book_detail_updated">Book detail updated</string>
+    <string name="clear_confirm_title">Clear?</string>
+    <string name="clear_confirm_text">Are you sure you want to clear the list?</string>
+    <string name="book_wrong_detail">Wrong/missing details</string>
 </resources>

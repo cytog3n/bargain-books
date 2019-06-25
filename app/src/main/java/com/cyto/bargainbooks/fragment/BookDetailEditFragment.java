@@ -27,7 +27,11 @@ public class BookDetailEditFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
-    private View view;
+    EditText title;
+
+    EditText author;
+
+    EditText isbn;
 
     private Book book;
 
@@ -56,16 +60,16 @@ public class BookDetailEditFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.fragment_book_edit_detail, container, false);
+        View view = inflater.inflate(R.layout.fragment_book_edit_detail, container, false);
         ((NavigationView) getActivity().findViewById(R.id.nav_view)).setCheckedItem(R.id.nav_wishlist);
 
         TextView titleLabel = view.findViewById(R.id.title_label);
         TextView authorLabel = view.findViewById(R.id.author_label);
         TextView isbnLabel = view.findViewById(R.id.isbn_value);
 
-        EditText title = view.findViewById(R.id.title);
-        EditText author = view.findViewById(R.id.author);
-        EditText isbn = view.findViewById(R.id.isbn);
+        title = view.findViewById(R.id.title);
+        author = view.findViewById(R.id.author);
+        isbn = view.findViewById(R.id.isbn);
 
         Button saveBtn = view.findViewById(R.id.save);
 
@@ -86,17 +90,31 @@ public class BookDetailEditFragment extends Fragment {
 
         saveBtn.setOnClickListener(v -> {
 
-            book.setTitle(title.getText().toString());
-            book.setAuthor(author.getText().toString());
-            book.setISBN(isbn.getText().toString());
+            if (bookDetailsValid()) {
 
-            BookWishlist.saveListToSharedPreferences(getContext());
+                book.setTitle(title.getText().toString());
+                book.setAuthor(author.getText().toString());
+                book.setISBN(isbn.getText().toString());
 
-            Navigation.findNavController(getActivity().findViewById(R.id.nav_host_fragment)).navigateUp();
-            Snackbar.make(view, getContext().getText(R.string.book_detail_updated), Snackbar.LENGTH_LONG).setAction("Action", null).show();
+                BookWishlist.saveListToSharedPreferences(getContext());
+
+                Navigation.findNavController(getActivity().findViewById(R.id.nav_host_fragment)).navigateUp();
+                Snackbar.make(getActivity().getCurrentFocus(), getContext().getText(R.string.book_detail_updated), Snackbar.LENGTH_LONG).setAction("Action", null).show();
+            } else {
+                Snackbar.make(getActivity().getCurrentFocus(), getContext().getText(R.string.book_wrong_detail), Snackbar.LENGTH_LONG).setAction("Action", null).show();
+            }
         });
 
         return view;
+    }
+
+    private boolean bookDetailsValid() {
+        if (title.getText().toString().trim().equals("")) return false;
+        if (author.getText().toString().trim().equals("")) return false;
+        if (isbn.getText().toString().length() != 13 || isbn.getText().toString().length() != 9) {
+            return false;
+        }
+        return isbn.getText().toString().matches("\\d+");
     }
 
     public void onButtonPressed(Uri uri) {

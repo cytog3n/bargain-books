@@ -39,8 +39,6 @@ public class ImportOnlineWishlistFragment extends Fragment {
 
     private ImportOnlineWishlistFragment.OnFragmentInteractionListener mListener;
 
-    private View view;
-
     private Button queryButton;
 
     private Button importButton;
@@ -84,7 +82,7 @@ public class ImportOnlineWishlistFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.fragment_import_online_wishlist, container, false);
+        View view = inflater.inflate(R.layout.fragment_import_online_wishlist, container, false);
         queryButton = view.findViewById(R.id.queryButton);
         importButton = view.findViewById(R.id.importButton);
         urlEditText = view.findViewById(R.id.urlEditText);
@@ -106,14 +104,14 @@ public class ImportOnlineWishlistFragment extends Fragment {
                         } else if (host.contains("libri")) {
                             startQuery("libri");
                         } else {
-                            Snackbar.make(view, getContext().getString(R.string.wrong_url_error), Snackbar.LENGTH_LONG).setAction("Action", null).show();
+                            Snackbar.make(getActivity().getCurrentFocus(), getContext().getString(R.string.wrong_url_error), Snackbar.LENGTH_LONG).setAction("Action", null).show();
                         }
                     }
                 } catch (IllegalArgumentException e) {
-                    Snackbar.make(view, getContext().getString(R.string.invalid_url_error), Snackbar.LENGTH_LONG).setAction("Action", null).show();
+                    Snackbar.make(getActivity().getCurrentFocus(), getContext().getString(R.string.invalid_url_error), Snackbar.LENGTH_LONG).setAction("Action", null).show();
                 }
             } else {
-                Snackbar.make(view, getContext().getString(R.string.invalid_url_error), Snackbar.LENGTH_LONG).setAction("Action", null).show();
+                Snackbar.make(getActivity().getCurrentFocus(), getContext().getString(R.string.invalid_url_error), Snackbar.LENGTH_LONG).setAction("Action", null).show();
             }
         });
 
@@ -126,7 +124,7 @@ public class ImportOnlineWishlistFragment extends Fragment {
 
             BookWishlist.saveBooks(books);
             BookWishlist.saveListToSharedPreferences(getContext());
-            Snackbar.make(view, getContext().getString(R.string.import_finished), Snackbar.LENGTH_LONG).setAction("Action", null).show();
+            Snackbar.make(getActivity().getCurrentFocus(), getContext().getString(R.string.import_finished), Snackbar.LENGTH_LONG).setAction("Action", null).show();
         });
 
         return view;
@@ -223,9 +221,9 @@ public class ImportOnlineWishlistFragment extends Fragment {
                 req = bookCount;
                 progressBar.setMax(bookCount);
                 progressBar.setVisibility(View.VISIBLE);
-                Snackbar.make(view, String.format(getContext().getString(R.string.importing_x_books), bookCount), Snackbar.LENGTH_LONG).setAction("Action", null).show();
+                Snackbar.make(getActivity().getCurrentFocus(), String.format(getContext().getString(R.string.importing_x_books), bookCount), Snackbar.LENGTH_LONG).setAction("Action", null).show();
             } else {
-                Snackbar.make(view, getContext().getString(R.string.empty_wishlist_error), Snackbar.LENGTH_LONG).setAction("Action", null).show();
+                Snackbar.make(getActivity().getCurrentFocus(), getContext().getString(R.string.empty_wishlist_error), Snackbar.LENGTH_LONG).setAction("Action", null).show();
             }
 
         }
@@ -235,12 +233,12 @@ public class ImportOnlineWishlistFragment extends Fragment {
         Date endDate = new Date();
         long diff = (endDate.getTime() - startDate.getTime()) / 1000;
         Log.d("Request time", diff / 1000 + " seconds");
-        Snackbar.make(view, String.format(getContext().getString(R.string.query_finished_sec), diff), Snackbar.LENGTH_LONG).setAction("Action", null).show();
+        Snackbar.make(getActivity().getCurrentFocus(), String.format(getContext().getString(R.string.query_finished_sec), diff), Snackbar.LENGTH_LONG).setAction("Action", null).show();
 
         if (resultBooks.size() > 0) {
             populateResultBooksLayout();
         } else {
-            Snackbar.make(view, getContext().getString(R.string.libriImportError), Snackbar.LENGTH_LONG).setAction("Action", null).show();
+            Snackbar.make(getActivity().getCurrentFocus(), getContext().getString(R.string.libriImportError), Snackbar.LENGTH_LONG).setAction("Action", null).show();
         }
 
         progressBar.setVisibility(View.GONE);

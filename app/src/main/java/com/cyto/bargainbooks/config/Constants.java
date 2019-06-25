@@ -37,6 +37,10 @@ public class Constants {
         put("ttkonline", "TTK Online");
     }};
 
+    public static final String SALE_TAG = "SALE";
+
+    public static final String DETAIL_TAG = "DETAIL_%s";
+
     /**
      * The default requestPolicy for the apllication. It has expanded timeout and retry.
      */

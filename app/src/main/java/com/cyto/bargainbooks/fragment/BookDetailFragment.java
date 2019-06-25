@@ -50,8 +50,6 @@ public class BookDetailFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
-    private View view;
-
     private ProgressBar progressBar;
 
     private Integer resCount = 0;
@@ -108,7 +106,7 @@ public class BookDetailFragment extends Fragment {
             progressBar.setVisibility(View.VISIBLE);
             List<StringRequest> srs = rf.getRequests(book, bh, eh);
             for (StringRequest sr : srs) {
-                vs.addToRequestQueue(sr.setRetryPolicy(Constants.requestPolicy));
+                vs.addToRequestQueue(sr.setRetryPolicy(Constants.requestPolicy).setTag(String.format(Constants.DETAIL_TAG, book.getISBN())));
             }
             reqCount += srs.size();
             progressBar.setMax(reqCount);
@@ -130,12 +128,11 @@ public class BookDetailFragment extends Fragment {
                             BookSaleList.saveListToSharedPreferences(getContext());
 
                             Navigation.findNavController(getActivity().findViewById(R.id.nav_host_fragment)).navigateUp();
-                            Snackbar.make(view, getContext().getText(R.string.book_removed_from_wishlist), Snackbar.LENGTH_LONG).setAction("Action", null).show();
+                            Snackbar.make(getActivity().getCurrentFocus(), getContext().getText(R.string.book_removed_from_wishlist), Snackbar.LENGTH_LONG).setAction("Action", null).show();
 
                         }
                     })
                     .setNegativeButton(getString(R.string.no), null)
-                    .setIcon(android.R.drawable.ic_dialog_alert)
                     .show();
 
         } else if (id == R.id.action_edit) {
@@ -151,7 +148,7 @@ public class BookDetailFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.fragment_book_detail, container, false);
+        View view = inflater.inflate(R.layout.fragment_book_detail, container, false);
         ((NavigationView) getActivity().findViewById(R.id.nav_view)).setCheckedItem(R.id.nav_wishlist);
         TextView title = view.findViewById(R.id.title);
         TextView author = view.findViewById(R.id.author);
@@ -262,7 +259,7 @@ public class BookDetailFragment extends Fragment {
         Date endDate = new Date();
         long diff = (endDate.getTime() - startDate.getTime()) / 1000;
         Log.d("Request time", diff / 1000 + " seconds");
-        Snackbar.make(view, String.format(getContext().getString(R.string.query_finished_sec), diff), Snackbar.LENGTH_LONG)
+        Snackbar.make(getActivity().getCurrentFocus(), String.format(getContext().getString(R.string.query_finished_sec), diff), Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show();
 
         refreshFragment();
@@ -304,10 +301,12 @@ public class BookDetailFragment extends Fragment {
      * Refreshes the fragment, so the onCreateView method will initialize the whole fragment.
      */
     private void refreshFragment() {
-        FragmentTransaction ft = getFragmentManager().beginTransaction();
-        if (Build.VERSION.SDK_INT >= 26) {
-            ft.setReorderingAllowed(false);
+        if (getFragmentManager().getPrimaryNavigationFragment() == this) {
+            FragmentTransaction ft = getFragmentManager().beginTransaction();
+            if (Build.VERSION.SDK_INT >= 26) {
+                ft.setReorderingAllowed(false);
+            }
+            ft.detach(this).attach(this).commit();
         }
-        ft.detach(this).attach(this).commit();
     }
 }

@@ -1,12 +1,17 @@
 package com.cyto.bargainbooks.fragment;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -16,24 +21,32 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import androidx.navigation.Navigation;
+
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
 import com.cyto.bargainbooks.R;
+import com.cyto.bargainbooks.config.Constants;
 import com.cyto.bargainbooks.model.Book;
+import com.cyto.bargainbooks.parser.BooklineWishlistParser;
 import com.cyto.bargainbooks.parser.LibriWishlistParser;
 import com.cyto.bargainbooks.parser.MolyWishlistParser;
+import com.cyto.bargainbooks.parser.Szazad21WishlistParser;
 import com.cyto.bargainbooks.request.handler.BookHandler;
 import com.cyto.bargainbooks.request.handler.ErrorHandler;
 import com.cyto.bargainbooks.request.handler.ListRequestHandler;
+import com.cyto.bargainbooks.service.VolleyService;
+import com.cyto.bargainbooks.storage.BookSaleList;
 import com.cyto.bargainbooks.storage.BookWishlist;
 
 import org.apache.commons.collections4.map.HashedMap;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 public class ImportOnlineWishlistFragment extends Fragment {
 
@@ -77,8 +90,29 @@ public class ImportOnlineWishlistFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
         Log.i("ImportOnlineWishlistFragment", "Created");
     }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.information_menu, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.action_info) {
+            Bundle bundle = new Bundle();
+            bundle.putString("element", "wishlist_layout");
+            Navigation.findNavController(getActivity().findViewById(R.id.nav_host_fragment)).navigate(R.id.InformationFragment, bundle);
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -99,10 +133,14 @@ public class ImportOnlineWishlistFragment extends Fragment {
                     if (host == null) {
                         Snackbar.make(view, getContext().getString(R.string.wrong_url_error), Snackbar.LENGTH_LONG).setAction("Action", null).show();
                     } else {
-                        if (host.contains("moly")) {
+                        if (host.contains("bookline")) {
+                            startQuery("bookline");
+                        } else if (host.contains("moly")) {
                             startQuery("moly");
                         } else if (host.contains("libri")) {
                             startQuery("libri");
+                        } else if (host.contains("21.szazadkiado")) {
+                            startQuery("21.szazadkiado");
                         } else {
                             Snackbar.make(getActivity().getCurrentFocus(), getContext().getString(R.string.wrong_url_error), Snackbar.LENGTH_LONG).setAction("Action", null).show();
                         }
@@ -122,7 +160,7 @@ public class ImportOnlineWishlistFragment extends Fragment {
                 if (entry.getValue()) books.add(entry.getKey());
             }
 
-            BookWishlist.saveBooks(books);
+            BookWishlist.mergeBooks(books);
             BookWishlist.saveListToSharedPreferences(getContext());
             Snackbar.make(getActivity().getCurrentFocus(), getContext().getString(R.string.import_finished), Snackbar.LENGTH_LONG).setAction("Action", null).show();
         });
@@ -138,15 +176,19 @@ public class ImportOnlineWishlistFragment extends Fragment {
         res = 0;
 
         switch (webpage) {
+            case "bookline":
+                new BooklineWishlistParser(getContext(), listRequestHandler, bh, eh).start(urlEditText.getText().toString());
+                break;
             case "libri":
                 new LibriWishlistParser(getContext(), listRequestHandler, bh, eh).start(urlEditText.getText().toString());
                 break;
             case "moly":
                 new MolyWishlistParser(getContext(), listRequestHandler, bh, eh).start(urlEditText.getText().toString());
                 break;
+            case "21.szazadkiado":
+                new Szazad21WishlistParser(getContext(), listRequestHandler, bh, eh).start(urlEditText.getText().toString());
+                break;
         }
-
-
     }
 
     public void onButtonPressed(Uri uri) {

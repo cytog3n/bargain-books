@@ -61,7 +61,7 @@ public class SzalayKonyvekBookRequest extends AbstractBookRequest {
             }
 
             if (detail != null) {
-                String urlRegex = "<link href=\"(.+)\" rel=\"canonical\" \\/>";
+                String urlRegex = "<meta property=\"og:url\" content=\"(.+)\" \\/>";
                 Pattern p = Pattern.compile(urlRegex);
                 Matcher m = p.matcher(response);
                 if (m.find()) {

@@ -6,6 +6,8 @@ import com.android.volley.Response;
 import com.android.volley.toolbox.StringRequest;
 import com.cyto.bargainbooks.config.Constants;
 import com.cyto.bargainbooks.factory.LibriBookFactory;
+import com.cyto.bargainbooks.factory.Szazad21BookFactory;
+import com.cyto.bargainbooks.model.Book;
 import com.cyto.bargainbooks.request.handler.BookHandler;
 import com.cyto.bargainbooks.request.handler.ErrorHandler;
 import com.cyto.bargainbooks.request.handler.ListRequestHandler;
@@ -20,7 +22,7 @@ import org.jsoup.select.Elements;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LibriWishlistParser {
+public class Szazad21WishlistParser {
 
     private VolleyService volleyService;
 
@@ -30,9 +32,7 @@ public class LibriWishlistParser {
 
     private ListRequestHandler listHandler;
 
-    private final String baseUrl = "https://www.libri.hu";
-
-    public LibriWishlistParser(@NotNull Context context, ListRequestHandler listHandler, @NotNull BookHandler bh, ErrorHandler eh) {
+    public Szazad21WishlistParser(@NotNull Context context, ListRequestHandler listHandler, @NotNull BookHandler bh, ErrorHandler eh) {
         this.volleyService = VolleyService.getInstance(context);
         this.bookHandler = bh;
         this.errorHandler = eh;
@@ -52,12 +52,12 @@ public class LibriWishlistParser {
         List<String> urls = new ArrayList<>();
 
         Document doc = Jsoup.parse(response);
-        Elements list = doc.select("div.box-product-basket-list");
+        Elements list = doc.select("div.wishlist_product_name");
 
         for (Element elem : list) {
-            Element a = elem.selectFirst("a.title");
+            Element a = elem.selectFirst("a");
             if (a != null) {
-                urls.add(baseUrl + a.attr("href"));
+                urls.add(a.attr("href"));
             } else {
                 // nop, just skip
             }
@@ -69,7 +69,7 @@ public class LibriWishlistParser {
 
         for (String s : urls) {
             volleyService.addToRequestQueue(new StringRequest(s, response1 -> {
-                bookHandler.handleBook(LibriBookFactory.createBook(response1));
+                bookHandler.handleBook(Szazad21BookFactory.createBook(response1));
             }, error -> {
                 Constants.errorListener.onErrorResponse(error);
                 if (errorHandler != null) {
@@ -79,5 +79,4 @@ public class LibriWishlistParser {
         }
 
     };
-
 }

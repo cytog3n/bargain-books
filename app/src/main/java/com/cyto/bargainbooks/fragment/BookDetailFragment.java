@@ -301,12 +301,10 @@ public class BookDetailFragment extends Fragment {
      * Refreshes the fragment, so the onCreateView method will initialize the whole fragment.
      */
     private void refreshFragment() {
-        if (getFragmentManager().getPrimaryNavigationFragment() == this) {
-            FragmentTransaction ft = getFragmentManager().beginTransaction();
-            if (Build.VERSION.SDK_INT >= 26) {
-                ft.setReorderingAllowed(false);
-            }
-            ft.detach(this).attach(this).commit();
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        if (Build.VERSION.SDK_INT >= 26) {
+            ft.setReorderingAllowed(false);
         }
+        ft.detach(this).attach(this).commit();
     }
 }

@@ -137,6 +137,8 @@ public class SaleFragment extends Fragment {
         } else if (id == R.id.action_refresh) {
             startDate = new Date();
             responseBooks.clear();
+            reqCount = 0;
+            resCount = 0;
             VolleyService vs = VolleyService.getInstance(getContext());
             for (Book b : BookWishlist.getBooks()) {
                 List<StringRequest> reqs = bookRequestFactory.getRequests(b, bh, eh);
@@ -175,8 +177,12 @@ public class SaleFragment extends Fragment {
     @Override
     public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        view = inflater.inflate(R.layout.fragment_sale, container, false);
+        View view = inflater.inflate(R.layout.fragment_sale, container, false);
         ((NavigationView) getActivity().findViewById(R.id.nav_view)).setCheckedItem(R.id.nav_sale);
+
+        expandableListTitle.clear();
+        expandableListDetail.clear();
+
         expandableListView = view.findViewById(R.id.expandableListView);
         progressBar = view.findViewById(R.id.progressBar);
         bookRequestFactory = new BookRequestFactory(getContext());
@@ -186,7 +192,6 @@ public class SaleFragment extends Fragment {
         } else if (saleLevel.equals("STORE_LEVEL")) {
             storeLevelList(view);
         }
-
         return view;
     }
 
@@ -200,7 +205,7 @@ public class SaleFragment extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         Log.i("SaleFragment", "Attached");
-        if (context instanceof SearchFragment.OnFragmentInteractionListener) {
+        if (context instanceof OnFragmentInteractionListener) {
             mListener = (SaleFragment.OnFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
@@ -233,16 +238,20 @@ public class SaleFragment extends Fragment {
      * Refreshes the fragment, so the onCreateView method will initialize the whole fragment.
      */
     private void refreshFragment() {
-        if (getFragmentManager().getPrimaryNavigationFragment() == this || getFragmentManager().getPrimaryNavigationFragment() == null) {
-
-            FragmentTransaction ft = getFragmentManager().beginTransaction();
-            if (Build.VERSION.SDK_INT >= 26) {
-                ft.setReorderingAllowed(false);
-            }
-            expandableListTitle.clear();
-            expandableListDetail.clear();
-            ft.detach(this).attach(this).commit();
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        if (Build.VERSION.SDK_INT >= 26) {
+            ft.setReorderingAllowed(false);
         }
+
+        for (int i = 0; i < expandableListTitle.size(); i++) {
+            if (expandableListView.isGroupExpanded(i)) {
+                expandableListView.collapseGroup(i);
+            }
+        }
+
+        expandableListTitle.clear();
+        expandableListDetail.clear();
+        ft.detach(this).attach(this).commit();
     }
 
     /**
@@ -361,7 +370,7 @@ public class SaleFragment extends Fragment {
         // DESC
         expandableListTitle.sort((o1, o2) -> Integer.compare((int) o2.second, (int) o1.second));
 
-        ExpandableStoreListAdapter expandableStoreListAdapter = new ExpandableStoreListAdapter(getContext(), expandableListTitle, expandableListDetail);
+        ExpandableStoreListAdapter expandableStoreListAdapter = new ExpandableStoreListAdapter(getContext(), getActivity(), expandableListTitle, expandableListDetail);
         expandableListView.setAdapter(expandableStoreListAdapter);
         expandableListView.setOnChildClickListener((parent, v, groupPosition, childPosition, id) -> {
 

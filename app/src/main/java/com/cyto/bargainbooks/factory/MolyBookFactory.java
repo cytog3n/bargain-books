@@ -12,7 +12,7 @@ import org.jsoup.select.Elements;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class MolyWishlistBookFactory {
+public class MolyBookFactory {
 
     public static Book createBook(String s) {
         Book b = new Book();
@@ -42,13 +42,12 @@ public class MolyWishlistBookFactory {
         }
 
 
-        Elements elements = doc.select("div.items div[id^=edition]");
-        if (elements != null) {
-            element = elements.first(); // TODO ??
+        Element elem = doc.selectFirst("div.items div[id^=edition]");
+        if (elem != null) {
 
-            String urlRegex = ": (\\d+)";
+            String urlRegex = "<strong>ISBN<\\/strong>: (\\d+)";
             Pattern p = Pattern.compile(urlRegex);
-            Matcher m = p.matcher(element.html());
+            Matcher m = p.matcher(elem.html());
             if (m.find()) {
                 b.setISBN(m.group(1));
             } else {

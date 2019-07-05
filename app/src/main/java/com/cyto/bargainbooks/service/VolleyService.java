@@ -56,4 +56,8 @@ public class VolleyService {
     public Boolean isThereAnyActiveRequests() {
         return  getActiveRequestCount() != 0;
     }
+
+    public void clearQueue() {
+        requestQueue.cancelAll(request -> true);
+    }
 }

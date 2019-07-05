@@ -111,7 +111,7 @@ public class BookDetailEditFragment extends Fragment {
     private boolean bookDetailsValid() {
         if (title.getText().toString().trim().equals("")) return false;
         if (author.getText().toString().trim().equals("")) return false;
-        if (isbn.getText().toString().length() != 13 || isbn.getText().toString().length() != 9) {
+        if (isbn.getText().toString().length() != 13 && isbn.getText().toString().length() != 9) {
             return false;
         }
         return isbn.getText().toString().matches("\\d+");

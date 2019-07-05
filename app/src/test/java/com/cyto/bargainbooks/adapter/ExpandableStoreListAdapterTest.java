@@ -6,6 +6,7 @@ import android.widget.TextView;
 
 import androidx.test.core.app.ApplicationProvider;
 
+import com.cyto.bargainbooks.MainActivity;
 import com.cyto.bargainbooks.R;
 import com.cyto.bargainbooks.config.Constants;
 import com.cyto.bargainbooks.model.Book;
@@ -14,6 +15,7 @@ import org.apache.commons.collections4.map.HashedMap;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 
 import java.util.ArrayList;
@@ -27,6 +29,8 @@ import static org.junit.Assert.assertNotNull;
 public class ExpandableStoreListAdapterTest {
 
     ExpandableStoreListAdapter expandableStoreListAdapter;
+
+    MainActivity myActivity;
 
     @Before
     public void setUp() throws Exception {
@@ -88,7 +92,9 @@ public class ExpandableStoreListAdapterTest {
         details.put("libri", b1);
         details.put("bookline", b2);
 
-        expandableStoreListAdapter = new ExpandableStoreListAdapter(ApplicationProvider.getApplicationContext(), listHead, details);
+        myActivity = Robolectric.buildActivity(MainActivity.class).create().get();
+
+        expandableStoreListAdapter = new ExpandableStoreListAdapter(ApplicationProvider.getApplicationContext(), myActivity, listHead, details);
     }
 
     @Test

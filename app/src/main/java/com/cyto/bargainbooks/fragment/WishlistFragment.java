@@ -89,6 +89,8 @@ public class WishlistFragment extends Fragment {
                     .show();
 
             return true;
+        } else if (id == R.id.action_add) {
+            Navigation.findNavController(getActivity().findViewById(R.id.nav_host_fragment)).navigate(R.id.AddBookFragment);
         }
         return super.onOptionsItemSelected(item);
     }
@@ -136,7 +138,7 @@ public class WishlistFragment extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         Log.i("WishlistFragment", "Attached");
-        if (context instanceof SearchFragment.OnFragmentInteractionListener) {
+        if (context instanceof OnFragmentInteractionListener) {
             mListener = (OnFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
@@ -157,9 +159,7 @@ public class WishlistFragment extends Fragment {
      * to the activity and potentially other fragments contained in that
      * activity.
      * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
+     * See the Android Training lesson <a href="http://developer.android.com/training/basics/fragments/communicating.html">Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
         void onFragmentInteraction(Uri uri);
@@ -169,13 +169,11 @@ public class WishlistFragment extends Fragment {
      * Refreshes the fragment, so the onCreateView method will initialize the whole fragment.
      */
     private void refreshFragment() {
-        if (getFragmentManager().getPrimaryNavigationFragment() == this) {
-            FragmentTransaction ft = getFragmentManager().beginTransaction();
-            if (Build.VERSION.SDK_INT >= 26) {
-                ft.setReorderingAllowed(false);
-            }
-            ft.detach(this).attach(this).commit();
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        if (Build.VERSION.SDK_INT >= 26) {
+            ft.setReorderingAllowed(false);
         }
+        ft.detach(this).attach(this).commit();
     }
 
 }

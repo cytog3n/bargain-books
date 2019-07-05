@@ -1,12 +1,17 @@
 package com.cyto.bargainbooks.adapter;
 
+import android.app.Activity;
 import android.content.Context;
+import android.os.Bundle;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.navigation.Navigation;
 
 import com.cyto.bargainbooks.R;
 import com.cyto.bargainbooks.config.Constants;
@@ -20,11 +25,13 @@ public class ExpandableStoreListAdapter extends BaseExpandableListAdapter {
     private final Context context;
     private final List<Pair> expandableListTitle;
     private final Map<String, List<Book>> expandableListDetail;
+    private final Activity activity;
 
-    public ExpandableStoreListAdapter(Context context, List<Pair> expandableListTitle, Map<String, List<Book>> expandableListDetail) {
+    public ExpandableStoreListAdapter(Context context, Activity activity, List<Pair> expandableListTitle, Map<String, List<Book>> expandableListDetail) {
         this.context = context;
         this.expandableListTitle = expandableListTitle;
         this.expandableListDetail = expandableListDetail;
+        this.activity = activity;
     }
 
     @Override
@@ -66,6 +73,15 @@ public class ExpandableStoreListAdapter extends BaseExpandableListAdapter {
         } else {
             price.setText(String.format(context.getString(R.string.price_tag_huf), book.getNewPrice()));
         }
+
+        ImageView compareBtn = convertView.findViewById(R.id.compareBtn);
+        compareBtn.setFocusable(false);
+
+        compareBtn.setOnClickListener(v -> {
+            Bundle bundle = new Bundle();
+            bundle.putString("isbn", book.getISBN());
+            Navigation.findNavController(activity.findViewById(R.id.nav_host_fragment)).navigate(R.id.BookDetailFragment, bundle);
+        });
 
         return convertView;
     }

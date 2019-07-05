@@ -9,7 +9,9 @@ import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 public final class BookWishlist {
 
@@ -36,6 +38,7 @@ public final class BookWishlist {
     }
 
     public static void saveListToSharedPreferences(Context context) {
+        bookList.sort(Comparator.comparing(Book::getTitle));
         Gson gson = new Gson();
         SharedPreferences sharedPreferences = context.getSharedPreferences("BargainBooks", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -46,6 +49,15 @@ public final class BookWishlist {
     public static void saveBooks(List<Book> b) {
         bookList.clear();
         bookList.addAll(b);
+    }
+
+    public static void mergeBooks(List<Book> b) {
+        b.forEach(obook -> {
+            Optional<Book> ob = bookList.stream().filter(book -> book.getISBN().equals(obook.getISBN())).findFirst();
+            if (!ob.isPresent()) {
+                bookList.add(obook);
+            }
+        });
     }
 
     public static void clear() {

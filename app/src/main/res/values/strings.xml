@@ -69,4 +69,33 @@
     <string name="clear_confirm_title">Clear?</string>
     <string name="clear_confirm_text">Are you sure you want to clear the list?</string>
     <string name="book_wrong_detail">Wrong/missing details</string>
+    <string name="clear_request_queue_confirm_text">There are active queries at the moment. Are you sure you want to cancel them?</string>
+    <string name="clear_request_queue_confirm_title">Active queries</string>
+    <string name="add_book_info">Please insert the link</string>
+    <string name="action_add">Add</string>
+    <string name="info">Information</string>
+    <string name="add_book_info_title">Information about adding new books via URL</string>
+    <string name="wishlist_info_title">Information about importing online wishlist</string>
+    <string name="infobox_title">Information about the application</string>
+
+    <string name="bookline_info_title">Bookline</string>
+    <string name="bookline_info_value">1, Login to the page\n2, Open your wishlist\n3, Create a new list \n4, Switch back to wishlist \n5, Copy the page URL\n\nExample: \nhttps://bookline.hu/productshelf/productshelfMain.action?ename=02342650C115313FB2997AA3F9FB4752&amp;listName=_&amp;page=1</string>
+    <string name="bookline_add_book_info_value">1, Open the page\n2, Search for the book\nCopy the page URL\n\nExample: \nhttps://bookline.hu/product/home.action?type=22&amp;_v=David_Guymer_Dorn_utolso_fia&amp;id=309244\n\nAdditional notes: \nSome books don\'t have ISBN code on the page. You can\'t add those.</string>
+
+    <string name="libri_info_title">Libri</string>
+    <string name="libri_info_value">1, Login to the page\n2, Open your wishlist\n3, Click on \'Publikus lista megtekintése\'\n4, Create a public wishlist\n5, Copy the URL of the public wishlist\n\nExample: \nhttps://www.libri.hu/kivansaglista/?c121e9cefab6e067b93b6d6ed8489521</string>
+    <string name="libri_add_book_info_value">1, Open the page\n2, Search for the book\nCopy the page URL\n\nExample: \nhttps://www.libri.hu/konyv/dan_abnett.ravenor-visszater.html</string>
+
+    <string name="moly_info_title">Moly</string>
+    <string name="moly_info_value">1, Login to the page\n2, Open your wishlist\n3, Copy the page URL\n\nExample: \nhttps://moly.hu/tagok/cytog3n/kivansaglista\n\nAdditional note: You don\'t have to login, you can use the https://moly.hu/tagok/{username}/kivansaglista link with your username.</string>
+    <string name="moly_add_book_info_value">1, Open the page\n2, Search for the book\nCopy the page URL\n\nExample: \nhttps://moly.hu/konyvek/dan-abnett-en-vagyok-a-meszaros \n\nAdditional notes:\nThere are books with multiples ISBN numbers. The application will add the book with the FIRST isbn. </string>
+
+    <string name="szazad21_info_title">21. Század kiadó</string>
+    <string name="szazad21_info_value">1, Login to the page\n2, Open your wishlist\n3, Click on \'Lista megosztása\'\n4, Fill the informations, and send the email into your adress\n5, Copy the URL from the bottom of the email\n\nExample: \nhttps://21.szazadkiado.hu/index.php?route=wishlist/wishlist&amp;listid=98b097d00037bca061d75bab5fb46556</string>
+    <string name="szazad21_add_book_info_value">1, Open the page\n2, Search for the book\nCopy the page URL\n\nExample: \nhttps://21.szazadkiado.hu/az-uj-munkatars-michelle-frances \n\nAdditional notes: \nYou may have to edit the title, because the page don\'t have title field, just [Title - Author/Additional comment]. </string>
+
+    <string name="mylibrary_wishlist_info_title">Information about importing from MyLibrary</string>
+    <string name="mylibrary_info_title">MyLibrary application</string>
+    <string name="mylibrary_info_value">1, Export your wishlist as an Excel file \n2, Browse the exported file for the application \n3, Click on import \n\nAdditional notes: \nImporting with this, will NOT merge with your previous list. This will create a new list based on the Excel file.</string>
+    <string name="infobox_value">Nyuszifülnek ^^</string>
 </resources>

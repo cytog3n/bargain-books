@@ -55,7 +55,7 @@ public class LiraBookRequest extends AbstractBookRequest {
             detail = doc.selectFirst("div.detail_item");
 
             if (detail != null) {
-                String urlRegex = "<link rel=\"canonical\" href=\"(.+)\" \\/>";
+                String urlRegex = "<meta property=\"og:url\" content=\"(.+)\" \\/>";
                 Pattern p = Pattern.compile(urlRegex);
                 Matcher m = p.matcher(response);
                 if (m.find()) {

@@ -1,5 +1,7 @@
 package com.cyto.bargainbooks;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -13,22 +15,24 @@ import android.view.MenuItem;
 
 import androidx.navigation.Navigation;
 
+import com.cyto.bargainbooks.fragment.AddBookFragment;
 import com.cyto.bargainbooks.fragment.BookDetailEditFragment;
 import com.cyto.bargainbooks.fragment.BookDetailFragment;
 import com.cyto.bargainbooks.fragment.ConfigFragment;
 import com.cyto.bargainbooks.fragment.ImportBooksFragment;
 import com.cyto.bargainbooks.fragment.ImportOnlineWishlistFragment;
+import com.cyto.bargainbooks.fragment.InformationFragment;
 import com.cyto.bargainbooks.fragment.SaleFragment;
-import com.cyto.bargainbooks.fragment.SearchFragment;
 import com.cyto.bargainbooks.fragment.WishlistFragment;
+import com.cyto.bargainbooks.service.VolleyService;
 import com.cyto.bargainbooks.storage.BookSaleList;
 import com.cyto.bargainbooks.storage.BookWishlist;
 import com.cyto.bargainbooks.storage.Config;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, WishlistFragment.OnFragmentInteractionListener,
-        SearchFragment.OnFragmentInteractionListener, SaleFragment.OnFragmentInteractionListener, ImportBooksFragment.OnFragmentInteractionListener,
-        ConfigFragment.OnFragmentInteractionListener, BookDetailFragment.OnFragmentInteractionListener, ImportOnlineWishlistFragment.OnFragmentInteractionListener,
-        BookDetailEditFragment.OnFragmentInteractionListener{
+        SaleFragment.OnFragmentInteractionListener, ImportBooksFragment.OnFragmentInteractionListener, ConfigFragment.OnFragmentInteractionListener,
+        BookDetailFragment.OnFragmentInteractionListener, ImportOnlineWishlistFragment.OnFragmentInteractionListener,
+        BookDetailEditFragment.OnFragmentInteractionListener, AddBookFragment.OnFragmentInteractionListener, InformationFragment.OnFragmentInteractionListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,7 +63,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            VolleyService vs = VolleyService.getInstance(this);
+            if (vs.isThereAnyActiveRequests()) {
+                new AlertDialog.Builder(this).setTitle(getString(R.string.clear_request_queue_confirm_title))
+                        .setMessage(getString(R.string.clear_request_queue_confirm_text))
+                        .setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                MainActivity.super.onBackPressed();
+                            }
+                        })
+                        .setNegativeButton(getString(R.string.no), null)
+                        .show();
+            } else {
+                super.onBackPressed();
+            }
         }
     }
 
@@ -68,18 +86,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_search) {
-            Navigation.findNavController(findViewById(R.id.nav_host_fragment)).navigate(R.id.SearchFragment);
-        } else if (id == R.id.nav_wishlist) {
-            Navigation.findNavController(findViewById(R.id.nav_host_fragment)).navigate(R.id.WishlistFragment);
-        } else if (id == R.id.nav_sale) {
-            Navigation.findNavController(findViewById(R.id.nav_host_fragment)).navigate(R.id.SaleFragment);
-        } else if (id == R.id.nav_import_books) {
-            Navigation.findNavController(findViewById(R.id.nav_host_fragment)).navigate(R.id.ImportBooksFragment);
-        } else if (id == R.id.nav_config) {
-            Navigation.findNavController(findViewById(R.id.nav_host_fragment)).navigate(R.id.ConfigFragment);
-        } else if (id == R.id.nav_import_libri_books) {
-            Navigation.findNavController(findViewById(R.id.nav_host_fragment)).navigate(R.id.ImportOnlineWishListFragment);
+        VolleyService vs = VolleyService.getInstance(this);
+
+        if (vs.isThereAnyActiveRequests()) {
+            new AlertDialog.Builder(this).setTitle(getString(R.string.clear_request_queue_confirm_title))
+                    .setMessage(getString(R.string.clear_request_queue_confirm_text))
+                    .setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            vs.clearQueue();
+                            navigate(id);
+                        }
+                    })
+                    .setNegativeButton(getString(R.string.no), null)
+                    .show();
+        } else {
+            navigate(id);
         }
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -90,6 +112,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public void onFragmentInteraction(Uri uri) {
         Log.d("Fragment interaction: ", uri.toString());
+    }
+
+    private void navigate(int id) {
+
+        if (id == R.id.nav_wishlist) {
+            Navigation.findNavController(findViewById(R.id.nav_host_fragment)).navigate(R.id.WishlistFragment);
+        } else if (id == R.id.nav_sale) {
+            Navigation.findNavController(findViewById(R.id.nav_host_fragment)).navigate(R.id.SaleFragment);
+        } else if (id == R.id.nav_import_books) {
+            Navigation.findNavController(findViewById(R.id.nav_host_fragment)).navigate(R.id.ImportBooksFragment);
+        } else if (id == R.id.nav_config) {
+            Navigation.findNavController(findViewById(R.id.nav_host_fragment)).navigate(R.id.ConfigFragment);
+        } else if (id == R.id.nav_import_libri_books) {
+            Navigation.findNavController(findViewById(R.id.nav_host_fragment)).navigate(R.id.ImportOnlineWishListFragment);
+        } else if (id == R.id.nav_info) {
+            Navigation.findNavController(findViewById(R.id.nav_host_fragment)).navigate(R.id.InformationFragment);
+        }
+
     }
 
 }

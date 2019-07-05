@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/fragment_info_scroll"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".fragment.InformationFragment">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dip"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/add_book_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/add_book_info_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/add_book_info_title"
+                android:textColor="@android:color/black"
+                android:textSize="20sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/bookline_info_title2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dip"
+                    android:layout_marginBottom="5dip"
+                    android:text="@string/bookline_info_title"
+                    android:textColor="@android:color/black" />
+
+                <TextView
+                    android:id="@+id/bookline_info_value2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dip"
+                    android:text="@string/bookline_add_book_info_value" />
+
+                <TextView
+                    android:id="@+id/libri_info_title2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dip"
+                    android:layout_marginBottom="5dip"
+                    android:text="@string/libri_info_title"
+                    android:textColor="@android:color/black" />
+
+                <TextView
+                    android:id="@+id/libri_info_value2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dip"
+                    android:text="@string/libri_add_book_info_value" />
+
+                <TextView
+                    android:id="@+id/moly_info_title2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dip"
+                    android:layout_marginBottom="5dip"
+                    android:text="@string/moly_info_title"
+                    android:textColor="@android:color/black" />
+
+                <TextView
+                    android:id="@+id/moly_info_value2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dip"
+                    android:text="@string/moly_add_book_info_value" />
+
+                <TextView
+                    android:id="@+id/szazad21_info_title2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dip"
+                    android:layout_marginBottom="5dip"
+                    android:text="@string/szazad21_info_title"
+                    android:textColor="@android:color/black" />
+
+                <TextView
+                    android:id="@+id/szazad21_info_value2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dip"
+                    android:text="@string/szazad21_add_book_info_value" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/wishlist_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/wishlist_info_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dip"
+                android:text="@string/wishlist_info_title"
+                android:textColor="@android:color/black"
+                android:textSize="20sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/bookline_info_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dip"
+                    android:layout_marginBottom="5dip"
+                    android:text="@string/bookline_info_title"
+                    android:textColor="@android:color/black" />
+
+                <TextView
+                    android:id="@+id/bookline_info_value"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dip"
+                    android:text="@string/bookline_info_value" />
+
+                <TextView
+                    android:id="@+id/libri_info_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dip"
+                    android:layout_marginBottom="5dip"
+                    android:text="@string/libri_info_title"
+                    android:textColor="@android:color/black" />
+
+                <TextView
+                    android:id="@+id/libri_info_value"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dip"
+                    android:text="@string/libri_info_value" />
+
+                <TextView
+                    android:id="@+id/moly_info_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dip"
+                    android:layout_marginBottom="5dip"
+                    android:text="@string/moly_info_title"
+                    android:textColor="@android:color/black" />
+
+                <TextView
+                    android:id="@+id/moly_info_value"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dip"
+                    android:text="@string/moly_info_value" />
+
+                <TextView
+                    android:id="@+id/szazad21_info_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dip"
+                    android:layout_marginBottom="5dip"
+                    android:text="@string/szazad21_info_title"
+                    android:textColor="@android:color/black" />
+
+                <TextView
+                    android:id="@+id/szazad21_info_value"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dip"
+                    android:text="@string/szazad21_info_value" />
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/mylibrary_wishlist_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/mylibrary_wishlist_info_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dip"
+                android:text="@string/mylibrary_wishlist_info_title"
+                android:textColor="@android:color/black"
+                android:textSize="20sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/mylibrary_info_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dip"
+                    android:layout_marginBottom="5dip"
+                    android:text="@string/mylibrary_info_title"
+                    android:textColor="@android:color/black" />
+
+                <TextView
+                    android:id="@+id/mylibrary_info_value"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dip"
+                    android:text="@string/mylibrary_info_value" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/infobox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/infobox_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dip"
+                android:text="@string/infobox_title"
+                android:textColor="@android:color/black"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/infobox_value"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/infobox_value" />
+        </LinearLayout>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="30dip" />
+
+    </LinearLayout>
+</ScrollView>

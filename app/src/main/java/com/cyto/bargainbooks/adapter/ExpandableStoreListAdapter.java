@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -74,7 +75,7 @@ public class ExpandableStoreListAdapter extends BaseExpandableListAdapter {
             price.setText(String.format(context.getString(R.string.price_tag_huf), book.getNewPrice()));
         }
 
-        ImageView compareBtn = convertView.findViewById(R.id.compareBtn);
+        Button compareBtn = convertView.findViewById(R.id.compareBtn);
         compareBtn.setFocusable(false);
 
         compareBtn.setOnClickListener(v -> {

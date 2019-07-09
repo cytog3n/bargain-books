@@ -243,6 +243,7 @@ public class SaleFragment extends Fragment {
             ft.setReorderingAllowed(false);
         }
 
+        // Collapse all meu before clearing
         for (int i = 0; i < expandableListTitle.size(); i++) {
             if (expandableListView.isGroupExpanded(i)) {
                 expandableListView.collapseGroup(i);

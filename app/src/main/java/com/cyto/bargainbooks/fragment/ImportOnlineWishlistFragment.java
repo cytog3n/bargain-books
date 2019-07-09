@@ -1,8 +1,6 @@
 package com.cyto.bargainbooks.fragment;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
@@ -24,9 +22,7 @@ import android.widget.TextView;
 import androidx.navigation.Navigation;
 
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 import com.cyto.bargainbooks.R;
-import com.cyto.bargainbooks.config.Constants;
 import com.cyto.bargainbooks.model.Book;
 import com.cyto.bargainbooks.parser.BooklineWishlistParser;
 import com.cyto.bargainbooks.parser.LibriWishlistParser;
@@ -35,18 +31,17 @@ import com.cyto.bargainbooks.parser.Szazad21WishlistParser;
 import com.cyto.bargainbooks.request.handler.BookHandler;
 import com.cyto.bargainbooks.request.handler.ErrorHandler;
 import com.cyto.bargainbooks.request.handler.ListRequestHandler;
-import com.cyto.bargainbooks.service.VolleyService;
-import com.cyto.bargainbooks.storage.BookSaleList;
 import com.cyto.bargainbooks.storage.BookWishlist;
-
-import org.apache.commons.collections4.map.HashedMap;
 
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class ImportOnlineWishlistFragment extends Fragment {
 
@@ -62,7 +57,7 @@ public class ImportOnlineWishlistFragment extends Fragment {
 
     private ProgressBar progressBar;
 
-    private Map<Book, Boolean> resultBooks = new HashedMap<>();
+    private Map<Book, Boolean> resultBooks = new HashMap<>();
 
     private Integer req = 0;
 
@@ -289,9 +284,8 @@ public class ImportOnlineWishlistFragment extends Fragment {
 
     private void populateResultBooksLayout() {
         resultBooksLinearLayout.removeAllViews();
-
-        for (Map.Entry<Book, Boolean> entry : resultBooks.entrySet()) {
-            Book b = entry.getKey();
+        resultBooks.keySet().stream().sorted(Comparator.comparing(Book::getTitle)).forEach(entry -> {
+            Book b = entry;
             View view = getLayoutInflater().inflate(R.layout.book_import_item, resultBooksLinearLayout, false);
             ((TextView) view.findViewById(R.id.title)).setText(b.getTitle());
             ((TextView) view.findViewById(R.id.author)).setText(b.getAuthor());
@@ -303,16 +297,11 @@ public class ImportOnlineWishlistFragment extends Fragment {
             });
 
             cb.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                /* String isbn = buttonView.getHint().toString();
-                Optional<Book> optBook = resultBooks.keySet().stream().filter(book -> book.getISBN().equals(isbn)).findFirst();
-                if (optBook.isPresent()) {
-                    resultBooks.replace(optBook.get(), isChecked);
-                }*/
                 resultBooks.replace(b, isChecked);
             });
 
             resultBooksLinearLayout.addView(view);
-        }
+        });
 
         if (resultBooks.size() > 0) {
             importButton.setVisibility(View.VISIBLE);

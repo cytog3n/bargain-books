@@ -13,14 +13,14 @@
         android:orientation="horizontal"
         android:weightSum="1">
 
-        <ImageView
+        <Button
             android:id="@+id/compareBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="24dip"
+            android:layout_height="24dip"
             android:layout_marginStart="20dip"
             android:layout_marginTop="5dip"
             android:layout_marginBottom="5dip"
-            app:srcCompat="@drawable/ic_baseline_visibility_24px" />
+            android:background="@drawable/ic_baseline_visibility_24px" />
 
         <TextView
             android:id="@+id/bookName"

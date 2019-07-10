@@ -45,7 +45,7 @@
     <string name="Import">Import </string>
     <string name="query">Query</string>
     <string name="libriImportError">Looks empty. :(</string>
-    <string name="importing_x_books">Importing %d books</string>
+    <string name="importing_x_books">Trying to import %d books</string>
     <string name="empty_url_error">Please give a valid URL for your public wishlist</string>
     <string name="import_libri_wishlist">Import Online wishlist</string>
     <string name="import_finished">Import finished</string>

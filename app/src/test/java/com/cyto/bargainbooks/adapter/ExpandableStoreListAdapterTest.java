@@ -6,7 +6,7 @@ import android.widget.TextView;
 
 import androidx.test.core.app.ApplicationProvider;
 
-import com.cyto.bargainbooks.MainActivity;
+import com.cyto.bargainbooks.activity.MainActivity;
 import com.cyto.bargainbooks.R;
 import com.cyto.bargainbooks.config.Constants;
 import com.cyto.bargainbooks.model.Book;

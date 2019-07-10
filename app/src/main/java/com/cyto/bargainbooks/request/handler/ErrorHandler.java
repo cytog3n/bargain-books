@@ -1,9 +1,14 @@
 package com.cyto.bargainbooks.request.handler;
 
-import com.android.volley.VolleyError;
-
+/**
+ * This interface is used as a callback in the {@link com.android.volley.Response.ErrorListener}
+ */
 public interface ErrorHandler {
 
-    void handleError(VolleyError error);
+    /**
+     * Callback with an {@link Exception}
+     * @param error
+     */
+    void handleError(Exception error);
 
 }

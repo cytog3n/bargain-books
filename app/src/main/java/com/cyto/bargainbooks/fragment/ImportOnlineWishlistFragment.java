@@ -21,16 +21,15 @@ import android.widget.TextView;
 
 import androidx.navigation.Navigation;
 
-import com.android.volley.VolleyError;
 import com.cyto.bargainbooks.R;
 import com.cyto.bargainbooks.model.Book;
-import com.cyto.bargainbooks.parser.BooklineWishlistParser;
-import com.cyto.bargainbooks.parser.LibriWishlistParser;
-import com.cyto.bargainbooks.parser.MolyWishlistParser;
-import com.cyto.bargainbooks.parser.Szazad21WishlistParser;
 import com.cyto.bargainbooks.request.handler.BookHandler;
 import com.cyto.bargainbooks.request.handler.ErrorHandler;
 import com.cyto.bargainbooks.request.handler.ListRequestHandler;
+import com.cyto.bargainbooks.request.wishlist.BooklineWishlistRequest;
+import com.cyto.bargainbooks.request.wishlist.LibriWishlistRequest;
+import com.cyto.bargainbooks.request.wishlist.MolyWishlistRequest;
+import com.cyto.bargainbooks.request.wishlist.Szazad21WishlistRequest;
 import com.cyto.bargainbooks.storage.BookWishlist;
 
 import java.net.URI;
@@ -38,10 +37,8 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class ImportOnlineWishlistFragment extends Fragment {
 
@@ -172,16 +169,16 @@ public class ImportOnlineWishlistFragment extends Fragment {
 
         switch (webpage) {
             case "bookline":
-                new BooklineWishlistParser(getContext(), listRequestHandler, bh, eh).start(urlEditText.getText().toString());
+                new BooklineWishlistRequest(getContext(), listRequestHandler, bh, eh).start(urlEditText.getText().toString());
                 break;
             case "libri":
-                new LibriWishlistParser(getContext(), listRequestHandler, bh, eh).start(urlEditText.getText().toString());
+                new LibriWishlistRequest(getContext(), listRequestHandler, bh, eh).start(urlEditText.getText().toString());
                 break;
             case "moly":
-                new MolyWishlistParser(getContext(), listRequestHandler, bh, eh).start(urlEditText.getText().toString());
+                new MolyWishlistRequest(getContext(), listRequestHandler, bh, eh).start(urlEditText.getText().toString());
                 break;
             case "21.szazadkiado":
-                new Szazad21WishlistParser(getContext(), listRequestHandler, bh, eh).start(urlEditText.getText().toString());
+                new Szazad21WishlistRequest(getContext(), listRequestHandler, bh, eh).start(urlEditText.getText().toString());
                 break;
         }
     }
@@ -242,7 +239,7 @@ public class ImportOnlineWishlistFragment extends Fragment {
 
     private ErrorHandler eh = new ErrorHandler() {
         @Override
-        public void handleError(VolleyError error) {
+        public void handleError(Exception error) {
             res++;
             progressBar.setProgress(res);
             if (res.equals(req)) {

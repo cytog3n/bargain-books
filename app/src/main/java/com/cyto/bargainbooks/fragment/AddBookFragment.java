@@ -20,12 +20,15 @@ import android.widget.TextView;
 import androidx.navigation.Navigation;
 
 import com.cyto.bargainbooks.R;
+import com.cyto.bargainbooks.factory.book.BookFactory;
+import com.cyto.bargainbooks.factory.book.BooklineBookFactory;
+import com.cyto.bargainbooks.factory.book.LibriBookFactory;
+import com.cyto.bargainbooks.factory.book.MolyBookFactory;
+import com.cyto.bargainbooks.factory.book.Szazad21BookFactory;
+import com.cyto.bargainbooks.factory.request.BookDetailRequestFactory;
 import com.cyto.bargainbooks.model.Book;
-import com.cyto.bargainbooks.parser.BooklineBookParser;
-import com.cyto.bargainbooks.parser.LibriBookParser;
-import com.cyto.bargainbooks.parser.MolyBookParser;
-import com.cyto.bargainbooks.parser.Szazad21BookParser;
 import com.cyto.bargainbooks.request.handler.BookHandler;
+import com.cyto.bargainbooks.service.VolleyService;
 import com.cyto.bargainbooks.storage.BookWishlist;
 
 import java.net.URI;
@@ -54,6 +57,10 @@ public class AddBookFragment extends Fragment {
     private Book book;
 
     private List<String> storeList = Arrays.asList("bookline", "libri", "moly", "21.szazadkiado");
+
+    private BookDetailRequestFactory bookDetailRequestFactory;
+
+    private VolleyService vs;
 
     public AddBookFragment() {
         // Required empty public constructor
@@ -110,30 +117,30 @@ public class AddBookFragment extends Fragment {
         isbn = view.findViewById(R.id.isbn_value);
         resultLayout = view.findViewById(R.id.resultLayout);
 
+        vs = VolleyService.getInstance(getContext());
+
         queryBtn.setOnClickListener(v -> {
-
+            BookFactory bf = null;
             switch (getStore()) {
-
                 case "bookline":
-                    BooklineBookParser booklineBookParser = new BooklineBookParser(getContext(), bh, null);
-                    booklineBookParser.start(url.getText().toString());
+                    bf = new BooklineBookFactory();
                     break;
                 case "libri":
-                    LibriBookParser libriBookParser = new LibriBookParser(getContext(), bh, null);
-                    libriBookParser.start(url.getText().toString());
+                    bf = new LibriBookFactory();
                     break;
                 case "moly":
-                    MolyBookParser molyBookParser = new MolyBookParser(getContext(), bh, null);
-                    molyBookParser.start(url.getText().toString());
+                    bf = new MolyBookFactory();
                     break;
                 case "21.szazadkiado":
-                    Szazad21BookParser szazad21BookParser = new Szazad21BookParser(getContext(), bh, null);
-                    szazad21BookParser.start(url.getText().toString());
+                    bf = new Szazad21BookFactory();
                     break;
                 default:
                     Snackbar.make(getActivity().getCurrentFocus(), getContext().getText(R.string.wrong_url_error), Snackbar.LENGTH_LONG).setAction("Action", null).show();
                     break;
+            }
 
+            if (bf != null) {
+                vs.addToRequestQueue(bookDetailRequestFactory.getStringRequest(url.getText().toString(), bh, null, bf));
             }
         });
 
@@ -152,7 +159,7 @@ public class AddBookFragment extends Fragment {
 
     private String getStore() {
         String uri = url.getText().toString();
-        String correctLink = "";
+        String correctLink = "error";
 
         for (String s : storeList) {
             if (uri.contains(s)) {

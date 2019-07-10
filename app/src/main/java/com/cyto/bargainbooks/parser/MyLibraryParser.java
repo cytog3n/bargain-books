@@ -16,6 +16,9 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Used for parsing the information from the XML file exported by @url{https://play.google.com/store/apps/details?id=com.vgm.mylibrary}
+ */
 public class MyLibraryParser {
 
     public List<Book> getBooks(InputStream stream) throws EncryptedDocumentException, IOException, InvalidFormatException {

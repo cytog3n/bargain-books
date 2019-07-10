@@ -29,7 +29,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.cyto.bargainbooks.R;
 import com.cyto.bargainbooks.config.Constants;
-import com.cyto.bargainbooks.factory.BookRequestFactory;
+import com.cyto.bargainbooks.factory.request.BookRequestFactory;
 import com.cyto.bargainbooks.model.Book;
 import com.cyto.bargainbooks.request.handler.BookHandler;
 import com.cyto.bargainbooks.request.handler.ErrorHandler;
@@ -285,7 +285,7 @@ public class BookDetailFragment extends Fragment {
 
     private final ErrorHandler eh = new ErrorHandler() {
         @Override
-        public void handleError(VolleyError error) {
+        public void handleError(Exception error) {
             resCount++;
             progressBar.setProgress(resCount);
 

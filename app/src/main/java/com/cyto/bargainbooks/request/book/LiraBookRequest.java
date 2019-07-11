@@ -21,33 +21,20 @@ import java.util.regex.Pattern;
 
 public class LiraBookRequest extends AbstractBookRequest {
 
-    private String url;
-
-    private Element detail;
-
     private final BookHandler bookHandler;
-
     private final ErrorHandler errorHandler;
-
+    private final Response.ErrorListener failedRequestListener = new Response.ErrorListener() {
+        @Override
+        public void onErrorResponse(VolleyError error) {
+            Constants.errorListener.onErrorResponse(error);
+            if (errorHandler != null) {
+                errorHandler.handleError(error);
+            }
+        }
+    };
+    private String url;
+    private Element detail;
     private Book book;
-
-    public LiraBookRequest(@NotNull Book book, @NotNull BookHandler bh, ErrorHandler eh) {
-        this.book = book;
-        this.bookHandler = bh;
-        this.errorHandler = eh;
-    }
-
-    @Override
-    public StringRequest getStringRequest() {
-
-        Map<String, String> params = new HashMap<>();
-        params.put("isbn", book.getISBN());
-        String search = "https://www.lira.hu/hu/reszletes_kereso?listtype=1&listorder=release_date&listdirection=desc&listpagenumber=20&listcurrentpage=0&detaled_search_category=001&detaled_search_title=&detaled_search_isbn=${isbn}&detaled_search_year=&detaled_search_price1=&detaled_search_price2=&detaled_search_author=&detaled_search_publisher=&detaled_search_description=&detaled_search_series=&detaled_search_labels=";
-        String url = UrlUtil.ApplyParameters(search, params);
-
-        return new StringRequest(url, listener, failedRequestListener);
-    }
-
     private final Response.Listener<String> listener = new Response.Listener<String>() {
         @Override
         public void onResponse(String response) {
@@ -68,15 +55,22 @@ public class LiraBookRequest extends AbstractBookRequest {
         }
     };
 
-    private final Response.ErrorListener failedRequestListener = new Response.ErrorListener() {
-        @Override
-        public void onErrorResponse(VolleyError error) {
-            Constants.errorListener.onErrorResponse(error);
-            if (errorHandler != null) {
-                errorHandler.handleError(error);
-            }
-        }
-    };
+    public LiraBookRequest(@NotNull Book book, @NotNull BookHandler bh, ErrorHandler eh) {
+        this.book = book;
+        this.bookHandler = bh;
+        this.errorHandler = eh;
+    }
+
+    @Override
+    public StringRequest getStringRequest() {
+
+        Map<String, String> params = new HashMap<>();
+        params.put("isbn", book.getISBN());
+        String search = "https://www.lira.hu/hu/reszletes_kereso?listtype=1&listorder=release_date&listdirection=desc&listpagenumber=20&listcurrentpage=0&detaled_search_category=001&detaled_search_title=&detaled_search_isbn=${isbn}&detaled_search_year=&detaled_search_price1=&detaled_search_price2=&detaled_search_author=&detaled_search_publisher=&detaled_search_description=&detaled_search_series=&detaled_search_labels=";
+        String url = UrlUtil.ApplyParameters(search, params);
+
+        return new StringRequest(url, listener, failedRequestListener);
+    }
 
     @Override
     protected Long getBookOldPrice() {

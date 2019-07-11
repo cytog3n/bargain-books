@@ -1,4 +1,4 @@
-package com.cyto.bargainbooks.request.wishlist;
+package com.cyto.bargainbooks.request.wishlist.impl;
 
 import android.content.Context;
 
@@ -6,10 +6,11 @@ import com.android.volley.Response;
 import com.android.volley.toolbox.StringRequest;
 import com.cyto.bargainbooks.config.Constants;
 import com.cyto.bargainbooks.factory.book.BookFactory;
-import com.cyto.bargainbooks.factory.book.BooklineBookFactory;
+import com.cyto.bargainbooks.factory.book.impl.BooklineBookFactory;
 import com.cyto.bargainbooks.request.handler.BookHandler;
 import com.cyto.bargainbooks.request.handler.ErrorHandler;
 import com.cyto.bargainbooks.request.handler.ListRequestHandler;
+import com.cyto.bargainbooks.request.wishlist.WishlistRequest;
 import com.cyto.bargainbooks.service.VolleyService;
 
 import org.jetbrains.annotations.NotNull;
@@ -30,49 +31,17 @@ import java.util.regex.Pattern;
  * <p>
  * NOTE: This class will only query the first 50 page of the wishlist.
  */
-public class BooklineWishlistRequest extends AbstractWishlistRequest {
+public class BooklineWishlistRequest implements WishlistRequest {
 
     private final String baseUrl = "https://bookline.hu";
-
     private final List<String> pageUrls = new ArrayList<>();
-
     private final List<String> bookUrls = new ArrayList<>();
-
     private final BookFactory bookFactory = new BooklineBookFactory();
-
+    private VolleyService volleyService;
+    private BookHandler bookHandler;
+    private ErrorHandler errorHandler;
+    private ListRequestHandler listHandler;
     private Long pageResponseCount;
-
-    /**
-     * Creates a new instance of BooklineWishlistRequest
-     *
-     * @param context     Will be used for the {@link VolleyService}
-     * @param listHandler Will be used for informing the users about the size of the list
-     * @param bh          Will handle the {@link com.cyto.bargainbooks.model.Book} entities
-     * @param eh          Will handle the exceptions. Optional
-     */
-    public BooklineWishlistRequest(@NotNull Context context, ListRequestHandler listHandler, @NotNull BookHandler bh, ErrorHandler eh) {
-        this.volleyService = VolleyService.getInstance(context);
-        this.bookHandler = bh;
-        this.errorHandler = eh;
-        this.listHandler = listHandler;
-    }
-
-    /**
-     * @see AbstractWishlistRequest#start(String)
-     */
-    @Override
-    public void start(String url) {
-        pageResponseCount = 1L; // Since the first query pulls the first 20 books, it's technicallly the first page
-        pageUrls.clear();
-        bookUrls.clear();
-        volleyService.addToRequestQueue(new StringRequest(url, onResponse, error -> {
-            Constants.errorListener.onErrorResponse(error);
-            if (errorHandler != null) {
-                errorHandler.handleError(error);
-            }
-        }).setRetryPolicy(Constants.requestPolicy));
-    }
-
     /**
      * The {@link com.android.volley.Response.Listener} for the first call. The response will handle the pagination as well (if needed)
      */
@@ -112,6 +81,37 @@ public class BooklineWishlistRequest extends AbstractWishlistRequest {
             }).setRetryPolicy(Constants.requestPolicy));
         }
     };
+
+    /**
+     * Creates a new instance of BooklineWishlistRequest
+     *
+     * @param context     Will be used for the {@link VolleyService}
+     * @param listHandler Will be used for informing the users about the size of the list
+     * @param bh          Will handle the {@link com.cyto.bargainbooks.model.Book} entities
+     * @param eh          Will handle the exceptions. Optional
+     */
+    public BooklineWishlistRequest(@NotNull Context context, ListRequestHandler listHandler, @NotNull BookHandler bh, ErrorHandler eh) {
+        this.volleyService = VolleyService.getInstance(context);
+        this.bookHandler = bh;
+        this.errorHandler = eh;
+        this.listHandler = listHandler;
+    }
+
+    /**
+     * @see WishlistRequest#start(String)
+     */
+    @Override
+    public void start(String url) {
+        pageResponseCount = 1L; // Since the first query pulls the first 20 books, it's technicallly the first page
+        pageUrls.clear();
+        bookUrls.clear();
+        volleyService.addToRequestQueue(new StringRequest(url, onResponse, error -> {
+            Constants.errorListener.onErrorResponse(error);
+            if (errorHandler != null) {
+                errorHandler.handleError(error);
+            }
+        }).setRetryPolicy(Constants.requestPolicy));
+    }
 
     /**
      * Adding the bookUrls from the given page.

@@ -1,4 +1,4 @@
-package com.cyto.bargainbooks.factory.book;
+package com.cyto.bargainbooks.factory.book.impl;
 
 import com.cyto.bargainbooks.factory.book.BookFactory;
 import com.cyto.bargainbooks.model.Book;
@@ -8,13 +8,20 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
 import org.jsoup.nodes.TextNode;
-import org.jsoup.select.Elements;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * BookFactory for @url{https://moly.hu}
+ *
+ * @see com.cyto.bargainbooks.factory.book.BookFactory
+ */
 public class MolyBookFactory implements BookFactory {
 
+    /**
+     * @see BookFactory#createBook(String)
+     */
     @Override
     public Book createBook(String s) {
         Book b = new Book();

@@ -33,12 +33,9 @@ import java.util.List;
 
 public class ImportBooksFragment extends Fragment {
 
-    private ImportBooksFragment.OnFragmentInteractionListener mListener;
-
-    private TextView browsePlaceholder;
-
     private static final int READ_REQUEST_CODE = 42;
-
+    private ImportBooksFragment.OnFragmentInteractionListener mListener;
+    private TextView browsePlaceholder;
     private Uri uri;
 
     public ImportBooksFragment() {

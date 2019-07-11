@@ -22,15 +22,13 @@ import android.widget.TextView;
 import androidx.navigation.Navigation;
 
 import com.cyto.bargainbooks.R;
+import com.cyto.bargainbooks.config.BookStoreList;
 import com.cyto.bargainbooks.model.Book;
 import com.cyto.bargainbooks.request.handler.BookHandler;
 import com.cyto.bargainbooks.request.handler.ErrorHandler;
 import com.cyto.bargainbooks.request.handler.ListRequestHandler;
-import com.cyto.bargainbooks.request.wishlist.BooklineWishlistRequest;
-import com.cyto.bargainbooks.request.wishlist.LibriWishlistRequest;
-import com.cyto.bargainbooks.request.wishlist.MolyWishlistRequest;
-import com.cyto.bargainbooks.request.wishlist.Szazad21WishlistRequest;
 import com.cyto.bargainbooks.storage.BookWishlist;
+import com.cyto.bargainbooks.store.BookStore;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -61,6 +59,44 @@ public class ImportOnlineWishlistFragment extends Fragment {
     private Integer res = 0;
 
     private Date startDate;
+    private BookHandler bh = new BookHandler() {
+        @Override
+        public void handleBook(Book b) {
+            res++;
+            progressBar.setProgress(res);
+            if (b != null) {
+                resultBooks.put(b, true);
+            }
+            Log.d("ImportOnlineWishlistFragment", "Requests: " + res + "/" + req);
+            if (res.equals(req)) {
+                onAllRequestComplete();
+            }
+        }
+    };
+    private ErrorHandler eh = new ErrorHandler() {
+        @Override
+        public void handleError(Exception error) {
+            res++;
+            progressBar.setProgress(res);
+            if (res.equals(req)) {
+                onAllRequestComplete();
+            }
+        }
+    };
+    private ListRequestHandler listRequestHandler = new ListRequestHandler() {
+        @Override
+        public void handleRequest(Integer bookCount) {
+            if (bookCount > 0) {
+                req = bookCount;
+                progressBar.setMax(bookCount);
+                progressBar.setVisibility(View.VISIBLE);
+                Snackbar.make(getActivity().getCurrentFocus(), String.format(getContext().getString(R.string.importing_x_books), bookCount), Snackbar.LENGTH_LONG).setAction("Action", null).show();
+            } else {
+                Snackbar.make(getActivity().getCurrentFocus(), getContext().getString(R.string.empty_wishlist_error), Snackbar.LENGTH_LONG).setAction("Action", null).show();
+            }
+
+        }
+    };
 
     public ImportOnlineWishlistFragment() {
         // Required empty public constructor
@@ -105,7 +141,6 @@ public class ImportOnlineWishlistFragment extends Fragment {
         return super.onOptionsItemSelected(item);
     }
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_import_online_wishlist, container, false);
@@ -119,24 +154,29 @@ public class ImportOnlineWishlistFragment extends Fragment {
             if (urlEditText.getText() != null) {
 
                 try {
-                    URI uri = URI.create(urlEditText.getText().toString());
-                    String host = uri.getHost();
+                    URI uri = URI.create(urlEditText.getText().toString()); //
+                    boolean match = false;
+                    for (BookStore bookStore : BookStoreList.storeList) {
+                        if (bookStore.matchWishlistUrl(uri.toString())) {
+                            match = true;
+                            try {
+                                startDate = new Date();
+                                resultBooks.clear();
+                                req = 0;
+                                res = 0;
+                                bookStore.getWishListRequest(getContext(), listRequestHandler, bh, eh).start(uri.toString());
 
-                    if (host == null) {
-                        Snackbar.make(view, getContext().getString(R.string.wrong_url_error), Snackbar.LENGTH_LONG).setAction("Action", null).show();
-                    } else {
-                        if (host.contains("bookline")) {
-                            startQuery("bookline");
-                        } else if (host.contains("moly")) {
-                            startQuery("moly");
-                        } else if (host.contains("libri")) {
-                            startQuery("libri");
-                        } else if (host.contains("21.szazadkiado")) {
-                            startQuery("21.szazadkiado");
-                        } else {
-                            Snackbar.make(getActivity().getCurrentFocus(), getContext().getString(R.string.wrong_url_error), Snackbar.LENGTH_LONG).setAction("Action", null).show();
+                                break;
+                            } catch (NullPointerException e) {
+                                Log.e("ImportOnlineWishlistFragment", "The " + bookStore.getStoreKey() + " is not implemented correctly.");
+                                Snackbar.make(getActivity().getCurrentFocus(), getContext().getText(R.string.incorrect_implementation), Snackbar.LENGTH_LONG).setAction("Action", null).show();
+                            }
                         }
                     }
+                    if (!match) {
+                        Snackbar.make(getActivity().getCurrentFocus(), getContext().getText(R.string.wrong_url_error), Snackbar.LENGTH_LONG).setAction("Action", null).show();
+                    }
+
                 } catch (IllegalArgumentException e) {
                     Snackbar.make(getActivity().getCurrentFocus(), getContext().getString(R.string.invalid_url_error), Snackbar.LENGTH_LONG).setAction("Action", null).show();
                 }
@@ -158,29 +198,6 @@ public class ImportOnlineWishlistFragment extends Fragment {
         });
 
         return view;
-    }
-
-    private void startQuery(String webpage) {
-
-        startDate = new Date();
-        resultBooks.clear();
-        req = 0;
-        res = 0;
-
-        switch (webpage) {
-            case "bookline":
-                new BooklineWishlistRequest(getContext(), listRequestHandler, bh, eh).start(urlEditText.getText().toString());
-                break;
-            case "libri":
-                new LibriWishlistRequest(getContext(), listRequestHandler, bh, eh).start(urlEditText.getText().toString());
-                break;
-            case "moly":
-                new MolyWishlistRequest(getContext(), listRequestHandler, bh, eh).start(urlEditText.getText().toString());
-                break;
-            case "21.szazadkiado":
-                new Szazad21WishlistRequest(getContext(), listRequestHandler, bh, eh).start(urlEditText.getText().toString());
-                break;
-        }
     }
 
     public void onButtonPressed(Uri uri) {
@@ -207,61 +224,6 @@ public class ImportOnlineWishlistFragment extends Fragment {
         Log.i("ImportOnlineWishlistFragment", "Detached");
         mListener = null;
     }
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        void onFragmentInteraction(Uri uri);
-    }
-
-    private BookHandler bh = new BookHandler() {
-        @Override
-        public void handleBook(Book b) {
-            res++;
-            progressBar.setProgress(res);
-            if (b != null) {
-                resultBooks.put(b, true);
-            }
-            Log.d("ImportOnlineWishlistFragment", "Requests: " + res + "/" + req);
-            if (res.equals(req)) {
-                onAllRequestComplete();
-            }
-        }
-    };
-
-    private ErrorHandler eh = new ErrorHandler() {
-        @Override
-        public void handleError(Exception error) {
-            res++;
-            progressBar.setProgress(res);
-            if (res.equals(req)) {
-                onAllRequestComplete();
-            }
-        }
-    };
-
-    private ListRequestHandler listRequestHandler = new ListRequestHandler() {
-        @Override
-        public void handleRequest(Integer bookCount) {
-            if (bookCount > 0) {
-                req = bookCount;
-                progressBar.setMax(bookCount);
-                progressBar.setVisibility(View.VISIBLE);
-                Snackbar.make(getActivity().getCurrentFocus(), String.format(getContext().getString(R.string.importing_x_books), bookCount), Snackbar.LENGTH_LONG).setAction("Action", null).show();
-            } else {
-                Snackbar.make(getActivity().getCurrentFocus(), getContext().getString(R.string.empty_wishlist_error), Snackbar.LENGTH_LONG).setAction("Action", null).show();
-            }
-
-        }
-    };
 
     private void onAllRequestComplete() {
         Date endDate = new Date();
@@ -303,6 +265,20 @@ public class ImportOnlineWishlistFragment extends Fragment {
         if (resultBooks.size() > 0) {
             importButton.setVisibility(View.VISIBLE);
         }
+    }
+
+    /**
+     * This interface must be implemented by activities that contain this
+     * fragment to allow an interaction in this fragment to be communicated
+     * to the activity and potentially other fragments contained in that
+     * activity.
+     * <p>
+     * See the Android Training lesson <a href=
+     * "http://developer.android.com/training/basics/fragments/communicating.html"
+     * >Communicating with Other Fragments</a> for more information.
+     */
+    public interface OnFragmentInteractionListener {
+        void onFragmentInteraction(Uri uri);
     }
 
 }

@@ -9,13 +9,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.navigation.Navigation;
 
 import com.cyto.bargainbooks.R;
-import com.cyto.bargainbooks.config.Constants;
+import com.cyto.bargainbooks.config.BookStoreList;
 import com.cyto.bargainbooks.model.Book;
 
 import java.util.List;
@@ -117,7 +116,7 @@ public class ExpandableStoreListAdapter extends BaseExpandableListAdapter {
 
         Integer count = (Integer) ((Pair) getGroup(listPosition)).second;
         String shopName = (String) ((Pair) getGroup(listPosition)).first;
-        shopName = Constants.storeMap.get(shopName);
+        shopName = BookStoreList.getBookStoreByKey(shopName).getStoreName();
 
         TextView shopNameTextView = convertView.findViewById(R.id.store_name);
         shopNameTextView.setText(shopName);

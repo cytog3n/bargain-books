@@ -59,7 +59,7 @@ public class InformationFragment extends Fragment {
         }
 
         if (elemToScroll != null) {
-            View elem = view.findViewById(getResources().getIdentifier((String) elemToScroll, "id", this.getContext().getPackageName()));
+            View elem = view.findViewById(getResources().getIdentifier(elemToScroll, "id", this.getContext().getPackageName()));
             if (elem != null) {
                 elem.requestFocus();
                 new Handler().post(new Runnable() {

@@ -9,6 +9,7 @@ public interface BookHandler {
 
     /**
      * Callback with a {@link Book}
+     *
      * @param b
      */
     void handleBook(Book b);

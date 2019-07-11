@@ -7,6 +7,7 @@ public interface ErrorHandler {
 
     /**
      * Callback with an {@link Exception}
+     *
      * @param error
      */
     void handleError(Exception error);

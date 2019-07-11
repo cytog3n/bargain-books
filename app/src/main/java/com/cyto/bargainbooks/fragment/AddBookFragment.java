@@ -20,21 +20,14 @@ import android.widget.TextView;
 import androidx.navigation.Navigation;
 
 import com.cyto.bargainbooks.R;
-import com.cyto.bargainbooks.factory.book.BookFactory;
-import com.cyto.bargainbooks.factory.book.BooklineBookFactory;
-import com.cyto.bargainbooks.factory.book.LibriBookFactory;
-import com.cyto.bargainbooks.factory.book.MolyBookFactory;
-import com.cyto.bargainbooks.factory.book.Szazad21BookFactory;
-import com.cyto.bargainbooks.factory.request.BookDetailRequestFactory;
+import com.cyto.bargainbooks.config.BookStoreList;
 import com.cyto.bargainbooks.model.Book;
 import com.cyto.bargainbooks.request.handler.BookHandler;
 import com.cyto.bargainbooks.service.VolleyService;
 import com.cyto.bargainbooks.storage.BookWishlist;
+import com.cyto.bargainbooks.store.BookStore;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Arrays;
-import java.util.List;
 
 public class AddBookFragment extends Fragment {
 
@@ -56,11 +49,23 @@ public class AddBookFragment extends Fragment {
 
     private Book book;
 
-    private List<String> storeList = Arrays.asList("bookline", "libri", "moly", "21.szazadkiado");
-
-    private BookDetailRequestFactory bookDetailRequestFactory;
-
     private VolleyService vs;
+    private BookHandler bh = new BookHandler() {
+        @Override
+        public void handleBook(Book b) {
+            if (b == null) {
+                Snackbar.make(getActivity().getCurrentFocus(), getContext().getText(R.string.wrong_url_error), Snackbar.LENGTH_LONG).setAction("Action", null).show();
+            } else {
+                book = b;
+
+                title.setText(b.getTitle());
+                author.setText(b.getAuthor());
+                isbn.setText(b.getISBN());
+
+                resultLayout.setVisibility(View.VISIBLE);
+            }
+        }
+    };
 
     public AddBookFragment() {
         // Required empty public constructor
@@ -120,27 +125,22 @@ public class AddBookFragment extends Fragment {
         vs = VolleyService.getInstance(getContext());
 
         queryBtn.setOnClickListener(v -> {
-            BookFactory bf = null;
-            switch (getStore()) {
-                case "bookline":
-                    bf = new BooklineBookFactory();
+            boolean match = false;
+            for (BookStore bookStore : BookStoreList.storeList) {
+                if (bookStore.matchBookDetail(url.getText().toString())) {
+                    match = true;
+                    try {
+                        vs.addToRequestQueue(bookStore.getBookDetailRequest(url.getText().toString(), bh, null));
+                    } catch (NullPointerException e) {
+                        Log.e("AddBookFragment", "The " + bookStore.getStoreKey() + " is not implemented correctly.");
+                        Snackbar.make(getActivity().getCurrentFocus(), getContext().getText(R.string.incorrect_implementation), Snackbar.LENGTH_LONG).setAction("Action", null).show();
+                    }
                     break;
-                case "libri":
-                    bf = new LibriBookFactory();
-                    break;
-                case "moly":
-                    bf = new MolyBookFactory();
-                    break;
-                case "21.szazadkiado":
-                    bf = new Szazad21BookFactory();
-                    break;
-                default:
-                    Snackbar.make(getActivity().getCurrentFocus(), getContext().getText(R.string.wrong_url_error), Snackbar.LENGTH_LONG).setAction("Action", null).show();
-                    break;
+                }
             }
 
-            if (bf != null) {
-                vs.addToRequestQueue(bookDetailRequestFactory.getStringRequest(url.getText().toString(), bh, null, bf));
+            if (!match) {
+                Snackbar.make(getActivity().getCurrentFocus(), getContext().getText(R.string.wrong_url_error), Snackbar.LENGTH_LONG).setAction("Action", null).show();
             }
         });
 
@@ -156,43 +156,6 @@ public class AddBookFragment extends Fragment {
 
         return view;
     }
-
-    private String getStore() {
-        String uri = url.getText().toString();
-        String correctLink = "error";
-
-        for (String s : storeList) {
-            if (uri.contains(s)) {
-                correctLink = s;
-                break;
-            }
-        }
-
-        try {
-            URI u = new URI(uri);
-        } catch (URISyntaxException e) {
-            correctLink = "error";
-        }
-
-        return correctLink;
-    }
-
-    private BookHandler bh = new BookHandler() {
-        @Override
-        public void handleBook(Book b) {
-            if (b == null) {
-                Snackbar.make(getActivity().getCurrentFocus(), getContext().getText(R.string.wrong_url_error), Snackbar.LENGTH_LONG).setAction("Action", null).show();
-            } else {
-                book = b;
-
-                title.setText(b.getTitle());
-                author.setText(b.getAuthor());
-                isbn.setText(b.getISBN());
-
-                resultLayout.setVisibility(View.VISIBLE);
-            }
-        }
-    };
 
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {

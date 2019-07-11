@@ -1,4 +1,4 @@
-package com.cyto.bargainbooks.request.wishlist;
+package com.cyto.bargainbooks.request.wishlist.impl;
 
 import android.content.Context;
 
@@ -6,10 +6,11 @@ import com.android.volley.Response;
 import com.android.volley.toolbox.StringRequest;
 import com.cyto.bargainbooks.config.Constants;
 import com.cyto.bargainbooks.factory.book.BookFactory;
-import com.cyto.bargainbooks.factory.book.LibriBookFactory;
+import com.cyto.bargainbooks.factory.book.impl.LibriBookFactory;
 import com.cyto.bargainbooks.request.handler.BookHandler;
 import com.cyto.bargainbooks.request.handler.ErrorHandler;
 import com.cyto.bargainbooks.request.handler.ListRequestHandler;
+import com.cyto.bargainbooks.request.wishlist.WishlistRequest;
 import com.cyto.bargainbooks.service.VolleyService;
 
 import org.jetbrains.annotations.NotNull;
@@ -24,12 +25,14 @@ import java.util.List;
 /**
  * This class will handle the Libri wishlists.
  */
-public class LibriWishlistRequest extends AbstractWishlistRequest {
+public class LibriWishlistRequest implements WishlistRequest {
 
     private final String baseUrl = "https://www.libri.hu";
-
     private final BookFactory bookFactory = new LibriBookFactory();
-
+    private VolleyService volleyService;
+    private BookHandler bookHandler;
+    private ErrorHandler errorHandler;
+    private ListRequestHandler listHandler;
     /**
      * The {@link com.android.volley.Response.Listener} for the first call.
      */
@@ -52,7 +55,7 @@ public class LibriWishlistRequest extends AbstractWishlistRequest {
 
         for (String s : urls) {
             volleyService.addToRequestQueue(new StringRequest(s, response1 -> {
-                bookHandler.handleBook(bookFactory.createBook(response));
+                bookHandler.handleBook(bookFactory.createBook(response1));
             }, error -> {
                 Constants.errorListener.onErrorResponse(error);
                 if (errorHandler != null) {
@@ -79,7 +82,7 @@ public class LibriWishlistRequest extends AbstractWishlistRequest {
     }
 
     /**
-     * @see AbstractWishlistRequest#start(String)
+     * @see WishlistRequest#start(String)
      */
     @Override
     public void start(String url) {

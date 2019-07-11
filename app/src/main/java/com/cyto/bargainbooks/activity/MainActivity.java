@@ -49,10 +49,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        BookWishlist.initializeList(this);
-        BookSaleList.initializeList(this);
-        Config.getInstance(this);
-
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setCheckedItem(R.id.nav_wishlist);
         navigationView.setNavigationItemSelectedListener(this);

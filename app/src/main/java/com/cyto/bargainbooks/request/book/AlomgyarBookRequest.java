@@ -19,13 +19,33 @@ import java.util.Map;
 
 public class AlomgyarBookRequest extends AbstractBookRequest {
 
-    private Element detail;
-
     private final BookHandler bookHandler;
-
     private final ErrorHandler errorHandler;
-
+    private final Response.ErrorListener failedRequestListener = new Response.ErrorListener() {
+        @Override
+        public void onErrorResponse(VolleyError error) {
+            Constants.errorListener.onErrorResponse(error);
+            if (errorHandler != null) {
+                errorHandler.handleError(error);
+            }
+        }
+    };
+    private Element detail;
     private Book book;
+    private final Response.Listener<String> listener = new Response.Listener<String>() {
+        @Override
+        public void onResponse(String response) {
+            Document doc = Jsoup.parse(response);
+            detail = doc.selectFirst("form.card.bookcard");
+
+            if (detail != null && detail.selectFirst("input[name='elojegyez']") != null) {
+                detail = null;
+            }
+
+            book = createBook(book.getISBN(), book.getAuthor(), book.getTitle());
+            bookHandler.handleBook(book);
+        }
+    };
 
     public AlomgyarBookRequest(@NotNull Book book, @NotNull BookHandler bh, ErrorHandler eh) {
         this.book = book;
@@ -43,31 +63,6 @@ public class AlomgyarBookRequest extends AbstractBookRequest {
 
         return new StringRequest(url, listener, failedRequestListener);
     }
-
-    private final Response.Listener<String> listener = new Response.Listener<String>() {
-        @Override
-        public void onResponse(String response) {
-            Document doc = Jsoup.parse(response);
-            detail = doc.selectFirst("form.card.bookcard");
-
-            if (detail != null && detail.selectFirst("input[name='elojegyez']") != null) {
-                detail = null;
-            }
-
-            book = createBook(book.getISBN(), book.getAuthor(), book.getTitle());
-            bookHandler.handleBook(book);
-        }
-    };
-
-    private final Response.ErrorListener failedRequestListener = new Response.ErrorListener() {
-        @Override
-        public void onErrorResponse(VolleyError error) {
-            Constants.errorListener.onErrorResponse(error);
-            if (errorHandler != null) {
-                errorHandler.handleError(error);
-            }
-        }
-    };
 
     @Override
     protected Long getBookOldPrice() {

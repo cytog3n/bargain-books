@@ -22,7 +22,6 @@ import android.view.ViewGroup;
 import android.widget.ExpandableListView;
 import android.widget.ProgressBar;
 
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.cyto.bargainbooks.R;
 import com.cyto.bargainbooks.adapter.ExpandableBookListAdapter;
@@ -50,30 +49,50 @@ import java.util.Optional;
 
 public class SaleFragment extends Fragment {
 
-    private SaleFragment.OnFragmentInteractionListener mListener;
-
-    private ExpandableListView expandableListView;
-
-    private ProgressBar progressBar;
-
-    private ExpandableBookListAdapter expandableBookListAdapter;
-
-    private Integer reqCount = 0;
-
-    private Integer resCount = 0;
-
-    private Date startDate;
-
     private final List<Pair> expandableListTitle = new ArrayList<>();
-
     private final Map<String, List<Book>> expandableListDetail = new HashMap<>();
-
+    private SaleFragment.OnFragmentInteractionListener mListener;
+    private ExpandableListView expandableListView;
+    private ProgressBar progressBar;
+    private ExpandableBookListAdapter expandableBookListAdapter;
+    private Integer reqCount = 0;
+    private Integer resCount = 0;
+    private Date startDate;
     private List<Book> responseBooks = new ArrayList<>();
+    private final BookHandler bh = new BookHandler() {
+        @Override
+        public void handleBook(Book b) {
+            resCount++;
+            if (b.getNewPrice() > 0 && b.getSalePercent() > 0) {
+                responseBooks.add(b);
+            }
 
+            progressBar.setProgress(resCount);
+            Optional<Book> wlBook = BookWishlist.getBooks().stream().filter(book -> b.getISBN().equals(book.getISBN())).findFirst();
+            wlBook.ifPresent(book -> book.setLastUpdateDate(startDate));
+            if (resCount.equals(reqCount)) {
+                onAllRequestComplete();
+            }
+
+            Log.d("Request list", reqCount + "/" + resCount);
+        }
+    };
+    private final ErrorHandler eh = new ErrorHandler() {
+        @Override
+        public void handleError(Exception error) {
+            resCount++;
+
+            progressBar.setProgress(resCount);
+
+            if (resCount.equals(reqCount)) {
+                onAllRequestComplete();
+            }
+
+            Log.d("Request list", reqCount + "/" + resCount);
+        }
+    };
     private BookRequestFactory bookRequestFactory;
-
     private Boolean sort = true; // true -> %; false -> alphabetically
-
     private String saleLevel;
 
     public SaleFragment() {
@@ -144,7 +163,12 @@ public class SaleFragment extends Fragment {
                 List<StringRequest> reqs = bookRequestFactory.getRequests(b, bh, eh);
                 reqCount += reqs.size();
                 for (StringRequest req : reqs) {
-                    vs.addToRequestQueue(req.setRetryPolicy(Constants.requestPolicy).setTag(Constants.SALE_TAG));
+                    if (req != null) {
+                        vs.addToRequestQueue(req.setRetryPolicy(Constants.requestPolicy).setTag(Constants.SALE_TAG));
+                    } else {
+                        Log.e("SalemilyFragment", "Got 'null' as a StringRequest. Please check the BookStoreList");
+                        reqCount--;
+                    }
                 }
             }
 
@@ -218,20 +242,6 @@ public class SaleFragment extends Fragment {
         super.onDetach();
         Log.i("SaleFragment", "Detached");
         mListener = null;
-    }
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        void onFragmentInteraction(Uri uri);
     }
 
     /**
@@ -390,37 +400,17 @@ public class SaleFragment extends Fragment {
         });
     }
 
-    private final BookHandler bh = new BookHandler() {
-        @Override
-        public void handleBook(Book b) {
-            resCount++;
-            if (b.getNewPrice() > 0 && b.getSalePercent() > 0) {
-                responseBooks.add(b);
-            }
-
-            progressBar.setProgress(resCount);
-            Optional<Book> wlBook = BookWishlist.getBooks().stream().filter(book -> b.getISBN().equals(book.getISBN())).findFirst();
-            wlBook.ifPresent(book -> book.setLastUpdateDate(startDate));
-            if (resCount.equals(reqCount)) {
-                onAllRequestComplete();
-            }
-
-            Log.d("Request list", reqCount + "/" + resCount);
-        }
-    };
-
-    private final ErrorHandler eh = new ErrorHandler() {
-        @Override
-        public void handleError(Exception error) {
-            resCount++;
-
-            progressBar.setProgress(resCount);
-
-            if (resCount.equals(reqCount)) {
-                onAllRequestComplete();
-            }
-
-            Log.d("Request list", reqCount + "/" + resCount);
-        }
-    };
+    /**
+     * This interface must be implemented by activities that contain this
+     * fragment to allow an interaction in this fragment to be communicated
+     * to the activity and potentially other fragments contained in that
+     * activity.
+     * <p>
+     * See the Android Training lesson <a href=
+     * "http://developer.android.com/training/basics/fragments/communicating.html"
+     * >Communicating with Other Fragments</a> for more information.
+     */
+    public interface OnFragmentInteractionListener {
+        void onFragmentInteraction(Uri uri);
+    }
 }

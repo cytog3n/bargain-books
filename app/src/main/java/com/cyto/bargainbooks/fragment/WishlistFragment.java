@@ -33,9 +33,8 @@ import java.util.Set;
 
 public class WishlistFragment extends Fragment {
 
-    private OnFragmentInteractionListener mListener;
-
     private final List<Pair> listTitle = new ArrayList<>();
+    private OnFragmentInteractionListener mListener;
 
     public WishlistFragment() {
         // Required empty public constructor
@@ -154,6 +153,17 @@ public class WishlistFragment extends Fragment {
     }
 
     /**
+     * Refreshes the fragment, so the onCreateView method will initialize the whole fragment.
+     */
+    private void refreshFragment() {
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        if (Build.VERSION.SDK_INT >= 26) {
+            ft.setReorderingAllowed(false);
+        }
+        ft.detach(this).attach(this).commit();
+    }
+
+    /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
      * to the activity and potentially other fragments contained in that
@@ -163,17 +173,6 @@ public class WishlistFragment extends Fragment {
      */
     public interface OnFragmentInteractionListener {
         void onFragmentInteraction(Uri uri);
-    }
-
-    /**
-     * Refreshes the fragment, so the onCreateView method will initialize the whole fragment.
-     */
-    private void refreshFragment() {
-        FragmentTransaction ft = getFragmentManager().beginTransaction();
-        if (Build.VERSION.SDK_INT >= 26) {
-            ft.setReorderingAllowed(false);
-        }
-        ft.detach(this).attach(this).commit();
     }
 
 }

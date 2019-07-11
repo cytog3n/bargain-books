@@ -18,6 +18,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import com.cyto.bargainbooks.R;
+import com.cyto.bargainbooks.config.BookStoreList;
 import com.cyto.bargainbooks.config.Constants;
 import com.cyto.bargainbooks.storage.Config;
 
@@ -154,6 +155,23 @@ public class ConfigFragment extends Fragment {
     }
 
     /**
+     * Populate the filters into the given LinearLayout
+     */
+    private void populateFilters(LayoutInflater inflater, LinearLayout stores) {
+
+        for (String store : config.getStoreFilter().keySet().stream().sorted(String::compareToIgnoreCase).collect(Collectors.toCollection(ArrayList::new))) {
+            View view = inflater.inflate(R.layout.config_filter_list_item, stores, false);
+            optionsMap.put(store, config.getStoreFilter().get(store));
+
+            ((TextView) view.findViewById(R.id.store_name)).setText(BookStoreList.getBookStoreByKey(store).getStoreName());
+            Switch storeValue = view.findViewById(R.id.store_value);
+            storeValue.setOnCheckedChangeListener((buttonView, isChecked) -> optionsMap.replace(store, isChecked));
+            storeValue.setChecked((Boolean) optionsMap.get(store));
+            stores.addView(view);
+        }
+    }
+
+    /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
      * to the activity and potentially other fragments contained in that
@@ -165,23 +183,6 @@ public class ConfigFragment extends Fragment {
      */
     public interface OnFragmentInteractionListener {
         void onFragmentInteraction(Uri uri);
-    }
-
-    /**
-     * Populate the filters into the given LinearLayout
-     */
-    private void populateFilters(LayoutInflater inflater, LinearLayout stores) {
-
-        for (String store : config.getStoreFilter().keySet().stream().sorted(String::compareToIgnoreCase).collect(Collectors.toCollection(ArrayList::new))) {
-            View view = inflater.inflate(R.layout.config_filter_list_item, stores, false);
-            optionsMap.put(store, config.getStoreFilter().get(store));
-
-            ((TextView) view.findViewById(R.id.store_name)).setText(Constants.storeMap.get(store));
-            Switch storeValue = view.findViewById(R.id.store_value);
-            storeValue.setOnCheckedChangeListener((buttonView, isChecked) -> optionsMap.replace(store, isChecked));
-            storeValue.setChecked((Boolean) optionsMap.get(store));
-            stores.addView(view);
-        }
     }
 
 }

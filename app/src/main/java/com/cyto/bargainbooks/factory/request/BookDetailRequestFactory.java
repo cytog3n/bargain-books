@@ -7,8 +7,20 @@ import com.cyto.bargainbooks.model.Book;
 import com.cyto.bargainbooks.request.handler.BookHandler;
 import com.cyto.bargainbooks.request.handler.ErrorHandler;
 
+/**
+ * This class is used for {@link com.cyto.bargainbooks.config.BookStoreList.BookStore}
+ */
 public class BookDetailRequestFactory {
 
+    /**
+     * Returns a {@link StringRequest} with populated fields
+     *
+     * @param url         URL of the BookDetail
+     * @param bh          callback
+     * @param eh          callback
+     * @param bookFactory the {@link BookFactory} which can handle the HTML on the given URL
+     * @return
+     */
     public StringRequest getStringRequest(String url, BookHandler bh, ErrorHandler eh, BookFactory bookFactory) {
         return new StringRequest(url, response -> {
             Book b = bookFactory.createBook(response);

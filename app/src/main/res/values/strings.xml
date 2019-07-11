@@ -98,4 +98,5 @@
     <string name="mylibrary_info_title">MyLibrary application</string>
     <string name="mylibrary_info_value">1, Export your wishlist as an Excel file \n2, Browse the exported file for the application \n3, Click on import \n\nAdditional notes: \nImporting with this, will NOT merge with your previous list. This will create a new list based on the Excel file.</string>
     <string name="infobox_value">Nyuszifülnek ^^</string>
+    <string name="incorrect_implementation">Wrong implementation. Please check the logs.</string>
 </resources>

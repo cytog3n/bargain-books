@@ -6,9 +6,8 @@ import android.widget.TextView;
 
 import androidx.test.core.app.ApplicationProvider;
 
-import com.cyto.bargainbooks.activity.MainActivity;
 import com.cyto.bargainbooks.R;
-import com.cyto.bargainbooks.config.Constants;
+import com.cyto.bargainbooks.activity.MainActivity;
 import com.cyto.bargainbooks.model.Book;
 
 import org.apache.commons.collections4.map.HashedMap;
@@ -163,7 +162,7 @@ public class ExpandableStoreListAdapterTest {
         TextView saleCount = view.findViewById(R.id.sale_count);
         assertNotNull(saleCount);
 
-        assertEquals("The storeName should come from the StoreMap", Constants.storeMap.get("libri"), storeName.getText());
+        assertEquals("The storeName should come from the StoreMap", "Libri", storeName.getText());
         assertEquals("There is 1 item in the first group", "1", saleCount.getText());
     }
 

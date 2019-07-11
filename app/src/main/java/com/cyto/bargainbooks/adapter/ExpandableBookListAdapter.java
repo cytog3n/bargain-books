@@ -10,7 +10,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.cyto.bargainbooks.R;
-import com.cyto.bargainbooks.config.Constants;
+import com.cyto.bargainbooks.config.BookStoreList;
 import com.cyto.bargainbooks.model.Book;
 
 import java.util.Comparator;
@@ -52,7 +52,7 @@ public class ExpandableBookListAdapter extends BaseExpandableListAdapter {
         if (book.getStore() == null) {
             shopName.setText(context.getString(R.string.no_available_store));
         } else {
-            shopName.setText(Constants.storeMap.get(book.getStore()));
+            shopName.setText(BookStoreList.getBookStoreByKey(book.getStore()).getStoreName());
         }
 
         TextView off = convertView.findViewById(R.id.off);

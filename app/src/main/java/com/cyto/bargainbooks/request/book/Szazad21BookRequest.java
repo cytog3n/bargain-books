@@ -22,33 +22,20 @@ import java.util.regex.Pattern;
 
 public class Szazad21BookRequest extends AbstractBookRequest {
 
-    private Element detail;
-
     private final BookHandler bookHandler;
-
     private final ErrorHandler errorHandler;
-
+    private final Response.ErrorListener failedRequestListener = new Response.ErrorListener() {
+        @Override
+        public void onErrorResponse(VolleyError error) {
+            Constants.errorListener.onErrorResponse(error);
+            if (errorHandler != null) {
+                errorHandler.handleError(error);
+            }
+        }
+    };
+    private Element detail;
     private Book book;
-
     private String url = null;
-
-    public Szazad21BookRequest(@NotNull Book book, @NotNull BookHandler bh, ErrorHandler eh) {
-        this.book = book;
-        this.bookHandler = bh;
-        this.errorHandler = eh;
-    }
-
-    @Override
-    public StringRequest getStringRequest() {
-
-        Map<String, String> params = new HashMap<>();
-        params.put("isbn", book.getISBN());
-        String search = "https://21.szazadkiado.hu/index.php?route=product/list&keyword=${isbn}";
-        String url = UrlUtil.ApplyParameters(search, params);
-
-        return new StringRequest(url, listener, failedRequestListener);
-    }
-
     private final Response.Listener<String> listener = new Response.Listener<String>() {
         @Override
         public void onResponse(String response) {
@@ -75,15 +62,22 @@ public class Szazad21BookRequest extends AbstractBookRequest {
         }
     };
 
-    private final Response.ErrorListener failedRequestListener = new Response.ErrorListener() {
-        @Override
-        public void onErrorResponse(VolleyError error) {
-            Constants.errorListener.onErrorResponse(error);
-            if (errorHandler != null) {
-                errorHandler.handleError(error);
-            }
-        }
-    };
+    public Szazad21BookRequest(@NotNull Book book, @NotNull BookHandler bh, ErrorHandler eh) {
+        this.book = book;
+        this.bookHandler = bh;
+        this.errorHandler = eh;
+    }
+
+    @Override
+    public StringRequest getStringRequest() {
+
+        Map<String, String> params = new HashMap<>();
+        params.put("isbn", book.getISBN());
+        String search = "https://21.szazadkiado.hu/index.php?route=product/list&keyword=${isbn}";
+        String url = UrlUtil.ApplyParameters(search, params);
+
+        return new StringRequest(url, listener, failedRequestListener);
+    }
 
     @Override
     protected Long getBookOldPrice() {

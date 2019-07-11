@@ -25,14 +25,10 @@ import java.util.Optional;
 
 public class BookDetailEditFragment extends Fragment {
 
-    private OnFragmentInteractionListener mListener;
-
     EditText title;
-
     EditText author;
-
     EditText isbn;
-
+    private OnFragmentInteractionListener mListener;
     private Book book;
 
     public BookDetailEditFragment() {

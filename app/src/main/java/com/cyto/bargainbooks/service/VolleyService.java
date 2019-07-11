@@ -11,12 +11,9 @@ import com.cyto.bargainbooks.util.RequestCountFilter;
 public class VolleyService {
 
     private static VolleyService volleyService;
-
-    private RequestQueue requestQueue;
-
     private final Context context;
-
     private final Integer c = 0;
+    private RequestQueue requestQueue;
 
     private VolleyService(Context context) {
         this.context = context;
@@ -54,7 +51,7 @@ public class VolleyService {
     }
 
     public Boolean isThereAnyActiveRequests() {
-        return  getActiveRequestCount() != 0;
+        return getActiveRequestCount() != 0;
     }
 
     public void clearQueue() {

@@ -110,7 +110,7 @@ public class ExpandableBookListAdapterTest {
     @Test
     public void getChildView() {
 
-        View view = expandableBookListAdapter.getChildView(0,0, false, null, null);
+        View view = expandableBookListAdapter.getChildView(0, 0, false, null, null);
         assertNotNull(view);
 
         TextView shopName = view.findViewById(R.id.shopName);

@@ -82,6 +82,32 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/og_price_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:paddingStart="5dip"
+            android:paddingEnd="5dip"
+            android:paddingBottom="5dip">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.6"
+                android:text="@string/original_price"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/original_price_value"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.4"
+                android:text="@string/price_placeholder"
+                android:textSize="14sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
             android:id="@+id/stores"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

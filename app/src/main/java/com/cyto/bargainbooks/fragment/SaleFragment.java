@@ -46,6 +46,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.logging.Logger;
 
 public class SaleFragment extends Fragment {
 
@@ -262,7 +263,12 @@ public class SaleFragment extends Fragment {
 
         expandableListTitle.clear();
         expandableListDetail.clear();
-        ft.detach(this).attach(this).commit();
+        try {
+            ft.detach(this).attach(this).commitAllowingStateLoss();
+        } catch (IllegalStateException e) {
+            // nop
+            Log.w("REFRESH", e.getCause());
+        }
     }
 
     /**

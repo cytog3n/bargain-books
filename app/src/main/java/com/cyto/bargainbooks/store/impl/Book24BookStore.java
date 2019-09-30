@@ -3,6 +3,9 @@ package com.cyto.bargainbooks.store.impl;
 import android.content.Context;
 
 import com.android.volley.toolbox.StringRequest;
+import com.cyto.bargainbooks.factory.book.BookFactory;
+import com.cyto.bargainbooks.factory.book.impl.Book24BookFactory;
+import com.cyto.bargainbooks.factory.request.BookDetailRequestFactory;
 import com.cyto.bargainbooks.model.Book;
 import com.cyto.bargainbooks.request.book.Book24BookRequest;
 import com.cyto.bargainbooks.request.handler.BookHandler;
@@ -13,7 +16,13 @@ import com.cyto.bargainbooks.store.BookStore;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.regex.Pattern;
+
 public class Book24BookStore implements BookStore {
+
+    private BookDetailRequestFactory bdrf = new BookDetailRequestFactory();
+
+    private BookFactory bf = new Book24BookFactory();
 
     /**
      * @see BookStore#getStoreKey()
@@ -44,7 +53,8 @@ public class Book24BookStore implements BookStore {
      */
     @Override
     public boolean matchBookDetail(String url) {
-        return false;
+        Pattern pattern = Pattern.compile("https:\\/\\/www\\.book24\\.hu\\/konyv\\/.+");
+        return pattern.matcher(url).find();
     }
 
     /**
@@ -52,7 +62,7 @@ public class Book24BookStore implements BookStore {
      */
     @Override
     public StringRequest getBookDetailRequest(String url, BookHandler bh, ErrorHandler eh) {
-        return null;
+        return bdrf.getStringRequest(url, bh, eh, bf);
     }
 
     /**

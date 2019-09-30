@@ -8,7 +8,7 @@ import com.cyto.bargainbooks.request.handler.BookHandler;
 import com.cyto.bargainbooks.request.handler.ErrorHandler;
 
 /**
- * This class is used for {@link com.cyto.bargainbooks.config.BookStoreList.BookStore}
+ * This class is used for {@link com.cyto.bargainbooks.store.BookStore}
  */
 public class BookDetailRequestFactory {
 

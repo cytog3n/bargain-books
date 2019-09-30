@@ -30,7 +30,7 @@ public class MolyBookStore implements BookStore {
      */
     @Override
     public String getStoreKey() {
-        return "moly";
+        return "molybolt";
     }
 
     /**

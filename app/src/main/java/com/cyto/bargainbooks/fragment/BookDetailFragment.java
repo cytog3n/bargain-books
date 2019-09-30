@@ -51,6 +51,8 @@ public class BookDetailFragment extends Fragment {
     private final SimpleDateFormat format = new SimpleDateFormat("yyyy.MM.dd");
     private OnFragmentInteractionListener mListener;
     private ProgressBar progressBar;
+    private TextView originalPrice;
+    private LinearLayout ogPriceLayout;
     private Integer resCount = 0;
     private Integer reqCount = 0;
     private Date startDate;
@@ -182,6 +184,8 @@ public class BookDetailFragment extends Fragment {
         TextView updateDate = view.findViewById(R.id.last_updated_value);
         TextView isbn = view.findViewById(R.id.isbn_value);
         LinearLayout stores = view.findViewById(R.id.stores);
+        originalPrice = view.findViewById(R.id.original_price_value);
+        ogPriceLayout = view.findViewById(R.id.og_price_layout);
         progressBar = view.findViewById(R.id.progressBar);
         String bisbn = this.getArguments().getString("isbn");
         Optional<Book> optBook = BookWishlist.getBooks().stream().filter(book1 -> book1.getISBN().equals(bisbn)).findFirst();
@@ -251,6 +255,25 @@ public class BookDetailFragment extends Fragment {
             ((TextView) view.findViewById(R.id.price)).setText(String.valueOf(b.getNewPrice()));
             ((TextView) view.findViewById(R.id.off)).setText(String.format(getContext().getString(R.string.sale_percent), b.getSalePercent()));
             stores.addView(view);
+        }
+
+        long price = -1;
+        for (int i = 0; i < bookList.size(); i++) {
+            if (!bookList.get(i).getStore().equals("numero7")) {
+                price = bookList.get(i).getOriginalPrice();
+                break;
+            }
+        }
+
+        if (price < 0 && bookList.size() > 0) {
+            price = bookList.get(0).getOriginalPrice();
+        }
+
+        if (price > 0) {
+            originalPrice.setText(String.format(getContext().getString(R.string.price_tag_huf), price));
+            ogPriceLayout.setVisibility(View.VISIBLE);
+        } else {
+            ogPriceLayout.setVisibility(View.GONE);
         }
     }
 

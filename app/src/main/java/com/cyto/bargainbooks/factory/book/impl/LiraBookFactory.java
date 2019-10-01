@@ -54,9 +54,9 @@ public class LiraBookFactory implements BookFactory {
         }
 
 
-        element = doc.selectFirst("div.product-details");
+        element = doc.selectFirst("div.datas");
 
-        if (element != null) {
+        if (element != null) { // TODO, its not working, need debug
             String urlRegex = "(\\d{13})";
             Pattern p = Pattern.compile(urlRegex);
             Matcher m = p.matcher(element.html());

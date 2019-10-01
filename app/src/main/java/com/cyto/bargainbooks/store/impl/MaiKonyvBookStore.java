@@ -53,7 +53,7 @@ public class MaiKonyvBookStore implements BookStore {
      */
     @Override
     public boolean matchBookDetail(String url) {
-        Pattern pattern = Pattern.compile("https:\\/\\/www\\.mai-konyv\\.hu\\/konyv\\/.+");
+        Pattern pattern = Pattern.compile("https:\\/\\/www\\.mai-konyv\\.hu\\/.+");
         return pattern.matcher(url).find();
     }
 
